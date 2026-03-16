@@ -1,4 +1,10 @@
+from database.conexao import conectar
+
+
 def menu_principal():
+    """
+    Exibe o menu principal do sistema de votação no terminal.
+    """
 
     print("\n==============================")
     print(" SISTEMA DE VOTAÇÃO LAD.PY ")
@@ -11,8 +17,24 @@ def menu_principal():
 
 
 def main():
+    """
+    Função principal do sistema. Responsável por iniciar o programa,
+    estabelecer conexão com o banco de dados e controlar o fluxo
+    do menu principal.
+
+    """
+
+    # tenta conectar ao banco
+    conexao = conectar()
+
+    if conexao is None:
+        print("Não foi possível conectar ao banco de dados.")
+        return
+
+    print("Conexão com o banco realizada com sucesso!")
 
     while True:
+
         menu_principal()
 
         opcao = input("Escolha uma opção: ")
