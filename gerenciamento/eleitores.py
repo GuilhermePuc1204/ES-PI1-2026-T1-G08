@@ -1,11 +1,10 @@
 import random
-#sem banco ate o momento
-eleitores = []
+from database.conexao import conectar
 
 
 def gerar_chave(nome):
     """
-    Gera chave de acesso:
+    Gera chave de acesso dessa forma:
     2 letras do primeiro nome + 1 do segundo + 4 números
     """
 
@@ -23,22 +22,20 @@ def gerar_chave(nome):
     return chave
 
 
-def cpf_existe(cpf):
-    for e in eleitores:
-        if e["cpf"] == cpf:
-            return True
-    return False
+def cpf_existe(cpf, cursor):
+    sql = "SELECT * FROM eleitores WHERE cpf = %s"
+    cursor.execute(sql, (cpf,))
+    return cursor.fetchone() is not None
 
 
-def titulo_existe(titulo):
-    for e in eleitores:
-        if e["titulo"] == titulo:
-            return True
-    return False
+def titulo_existe(titulo, cursor):
+    sql = "SELECT * FROM eleitores WHERE titulo_eleitor = %s"
+    cursor.execute(sql, (titulo,))
+    return cursor.fetchone() is not None
 
 
 def cadastrar_eleitor():
-    
+
     print("\n=== CADASTRO DE ELEITOR ===")
 
     nome = input("Nome completo: ")
@@ -46,13 +43,23 @@ def cadastrar_eleitor():
     titulo = input("Título de eleitor: ")
     mesario = input("É mesário? (s/n): ").lower() == "s"
 
-    # duplicidade
-    if cpf_existe(cpf):
-        print("CPF já cadastrado.")
+    con = conectar()
+
+    if con is None:
+        print("Erro na conexão com o banco.")
         return
 
-    if titulo_existe(titulo):
+    cursor = con.cursor()
+
+    # duplicidade
+    if cpf_existe(cpf, cursor):
+        print("CPF já cadastrado.")
+        con.close()
+        return
+
+    if titulo_existe(titulo, cursor):
         print("Título já cadastrado.")
+        con.close()
         return
 
     # gerar chave
@@ -60,18 +67,19 @@ def cadastrar_eleitor():
 
     if not chave:
         print("Erro ao gerar chave. Nome inválido.")
+        con.close()
         return
 
-    eleitor = {
-        "nome": nome,
-        "cpf": cpf,
-        "titulo": titulo,
-        "mesario": mesario,
-        "chave": chave,
-        "status": "NAO_VOTOU"
-    }
+    # inserir no banco
+    sql = """
+    INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
+    VALUES (%s, %s, %s, %s, %s)
+    """
 
-    eleitores.append(eleitor)
+    cursor.execute(sql, (nome, cpf, titulo, mesario, chave))
+
+    con.commit()
+    con.close()
 
     print("\nEleitor cadastrado com sucesso!")
     print("Chave de acesso:", chave)
