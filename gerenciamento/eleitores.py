@@ -3,30 +3,15 @@ from database.conexao import conexao, cursor
 
 
 def gerar_chave(nome):
-    """
-    Gera chave de acesso:
-    2 letras do primeiro nome + 1 do segundo + 4 números
-    """
-
     partes = nome.upper().split()
 
     if len(partes) < 2:
         return None
 
-    chave = (
-        partes[0][:2] +
-        partes[1][0] +
-        str(random.randint(1000, 9999))
-    )
-
-    return chave
+    return partes[0][:2] + partes[1][0] + str(random.randint(1000, 9999))
 
 
 def cadastrar_eleitor():
-    """
-    Cadastra um novo eleitor no banco de dados
-    """
-
     print("\n=== CADASTRO DE ELEITOR ===")
 
     nome = input("Nome completo: ")
@@ -42,14 +27,12 @@ def cadastrar_eleitor():
         print("CPF ou título já cadastrado.")
         return
 
-    # gera chave
     chave = gerar_chave(nome)
 
     if not chave:
-        print("Erro ao gerar chave. Nome inválido.")
+        print("Nome inválido.")
         return
 
-    # insert no banco
     sql = """
     INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
     VALUES (%s, %s, %s, %s, %s)
@@ -59,27 +42,23 @@ def cadastrar_eleitor():
     conexao.commit()
 
     print("\nEleitor cadastrado com sucesso!")
-    print("Chave de acesso:", chave)
+    print("Chave:", chave)
 
 
 def listar_eleitores():
-    """
-    Lista todos os eleitores cadastrados
-    """
-
     print("\n=== LISTA DE ELEITORES ===")
 
     sql = "SELECT nome, cpf, titulo_eleitor, mesario, status_voto FROM eleitores"
     cursor.execute(sql)
 
-    resultados = cursor.fetchall()
+    dados = cursor.fetchall()
 
-    if not resultados:
+    if not dados:
         print("Nenhum eleitor cadastrado.")
         return
 
-    for e in resultados:
-        print("------------------------")
+    for e in dados:
+        print("\n------------------")
         print("Nome:", e[0])
         print("CPF:", e[1])
         print("Título:", e[2])
@@ -87,27 +66,51 @@ def listar_eleitores():
         print("Status:", e[4])
 
 
-def menu_gerenciamento():
+def buscar_eleitor():
+    print("\n=== BUSCAR ELEITOR ===")
+
+    valor = input("CPF ou Título: ")
+
+    sql = """
+    SELECT nome, cpf, titulo_eleitor, mesario, status_voto
+    FROM eleitores
+    WHERE cpf = %s OR titulo_eleitor = %s
     """
-    Menu do módulo de gerenciamento
-    """
 
-    while True:
-        print("\n=== GERENCIAMENTO ===")
-        print("1 - Cadastrar eleitor")
-        print("2 - Listar eleitores")
-        print("0 - Voltar")
+    cursor.execute(sql, (valor, valor))
+    e = cursor.fetchone()
 
-        opcao = input("Escolha uma opção: ")
+    if not e:
+        print("Eleitor não encontrado.")
+        return
 
-        if opcao == "1":
-            cadastrar_eleitor()
+    print("\n=== ENCONTRADO ===")
+    print("Nome:", e[0])
+    print("CPF:", e[1])
+    print("Título:", e[2])
+    print("Mesário:", "Sim" if e[3] else "Não")
+    print("Status:", e[4])
 
-        elif opcao == "2":
-            listar_eleitores()
 
-        elif opcao == "0":
-            break
+def remover_eleitor():
+    print("\n=== REMOVER ELEITOR ===")
 
-        else:
-            print("Opção inválida.")
+    cpf = input("CPF: ")
+
+    sql = "SELECT * FROM eleitores WHERE cpf = %s"
+    cursor.execute(sql, (cpf,))
+
+    if not cursor.fetchone():
+        print("Eleitor não encontrado.")
+        return
+
+    confirm = input("Confirmar remoção? (s/n): ")
+
+    if confirm != "s":
+        return
+
+    sql = "DELETE FROM eleitores WHERE cpf = %s"
+    cursor.execute(sql, (cpf,))
+    conexao.commit()
+
+    print("Removido com sucesso.")
