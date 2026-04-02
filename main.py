@@ -2,8 +2,8 @@ from gerenciamento.menu_gerenciamento import menu_gerenciamento  # importa a fun
 
 
 def main():  # função principal do sistema
-
-    while True:  # loop infinito para manter o sistema em execução
+    op=1
+    while (op != 0):  # loop infinito para manter o sistema em execução
         print("\n=== SISTEMA DE VOTACAO ===")  # título do sistema
         print("1 - Gerenciamento")           # opção para acessar o gerenciamento
         print("2 - Votacao")                 # opção para acessar a votação
@@ -19,7 +19,6 @@ def main():  # função principal do sistema
 
         elif op == "0":  # se a opção for 0
             print("Saindo...")  # mensagem de saída
-            break  # encerra o loop e finaliza o programa
 
         else:  # se a opção for inválida
             print("Opção inválida.")  # informa erro de opção

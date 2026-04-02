@@ -5,10 +5,10 @@ from gerenciamento.eleitores import (
     remover_eleitor     # importa a função que remove um eleitor
 )
 
-
+op=1
 def menu_gerenciamento():  # função que exibe e controla o menu de gerenciamento de eleitores
 
-    while True:  # loop infinito para manter o menu ativo até o usuário sair
+    while (op != 0):  # loop infinito para manter o menu ativo até o usuário sair
         print("\n=== GERENCIAMENTO ===")  # título do menu
         print("1 - Cadastrar eleitor")   # opção para cadastrar eleitor
         print("2 - Listar eleitores")    # opção para listar eleitores
@@ -31,7 +31,7 @@ def menu_gerenciamento():  # função que exibe e controla o menu de gerenciamen
             remover_eleitor()  # chama a função de remoção de eleitor
 
         elif op == "0":  # se a opção for 0
-            break  # encerra o loop e sai do menu
+            print("Voltando...")  # Imprime a mensagem de retorno ao menu principal
 
         else:  # se a opção não for válida
             print("Opção inválida.")  # informa que a opção escolhida é inválida
