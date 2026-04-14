@@ -1,7 +1,9 @@
 import random  # importa o módulo random para gerar valores aleatórios
+import re  # importa o módulo re para expressões regulares
 from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
 from utils.validacoes import validar_cpf, validar_titulo_eleitor, validar_documentos  # importa as funções de validação de CPF e título de eleitor
 from utils.criptografia import criptografar_cpf # Impporta a função de criptografia de cpf.
+from utils.criptografia import criptografar_chave_acesso # Importa a função de criptografia da chave de acesso.
 
 def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
     partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
@@ -46,85 +48,126 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
     if not chave:  # se a chave não foi gerada (ex: nome inválido)
         print("Nome inválido.")  # informa que o nome não permitiu gerar chave
         return  # sai da função
+    
+    
+    # Criptografia da chave de acesso (RNF006)
+    chave_criptografada = criptografar_chave_acesso(chave)
+
 
     sql = """  # comando SQL para inserir um novo eleitor
     INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
     VALUES (%s, %s, %s, %s, %s)
     """
 
-    cursor.execute(sql, (nome, cpf_criptografado, titulo, mesario, chave))  # executa o INSERT com os dados do eleitor
+    cursor.execute(sql, (nome, cpf_criptografado, titulo, mesario, chave_criptografada))  # executa o INSERT com os dados do eleitor
     conexao.commit()  # confirma a inserção no banco de dados
 
     print("\nEleitor cadastrado com sucesso!")  # mensagem de sucesso
     print("Chave:", chave)  # exibe a chave de acesso gerada
 
 
-def listar_eleitores():  # função para listar todos os eleitores cadastrados
-    print("\n=== LISTA DE ELEITORES ===")  # mostra o título da listagem
+def listar_eleitores():
+    print("\n=== LISTA DE ELEITORES ===")
 
-    sql = "SELECT nome, cpf, titulo_eleitor, mesario, status_voto FROM eleitores"  # comando SQL para buscar dados dos eleitores
-    cursor.execute(sql)  # executa o SELECT
-
-    dados = cursor.fetchall()  # busca todos os registros retornados
-
-    if not dados:  # se não houver registros
-        print("Nenhum eleitor cadastrado.")  # informa que não há eleitores
-        return  # sai da função
-
-    for e in dados:  # percorre cada eleitor retornado
-        print("\n------------------")  # separador visual
-        print("Nome:", e[0])  # imprime o nome
-        print("CPF:", e[1])  # imprime o CPF
-        print("Título:", e[2])  # imprime o título de eleitor
-        print("Mesário:", "Sim" if e[3] else "Não")  # imprime "Sim" ou "Não" dependendo do boolean mesario
-        print("Status:", e[4])  # imprime o status do voto
-
-
-def buscar_eleitor():  # função para buscar um eleitor pelo CPF ou título
-    print("\n=== BUSCAR ELEITOR ===")  # mostra o título da busca
-
-    valor = input("CPF ou Título: ")  # lê o valor que pode ser CPF ou título
-
-    sql = """  # comando SQL para buscar eleitor pelo CPF ou pelo título
+    sql = """
     SELECT nome, cpf, titulo_eleitor, mesario, status_voto
     FROM eleitores
-    WHERE cpf = %s OR titulo_eleitor = %s
     """
+    cursor.execute(sql)
+    dados = cursor.fetchall()
 
-    cursor.execute(sql, (valor, valor))  # executa o SELECT usando o mesmo valor para CPF ou título
-    e = cursor.fetchone()  # busca um único registro encontrado
+    if not dados:
+        print("Nenhum eleitor cadastrado.")
+        return
 
-    if not e:  # se não encontrou nenhum eleitor
-        print("Eleitor não encontrado.")  # informa que não existe
-        return  # sai da função
-
-    print("\n=== ENCONTRADO ===")  # título de encontrado
-    print("Nome:", e[0])  # imprime o nome
-    print("CPF:", e[1])  # imprime o CPF
-    print("Título:", e[2])  # imprime o título
-    print("Mesário:", "Sim" if e[3] else "Não")  # imprime se é mesário
-    print("Status:", e[4])  # imprime o status do voto
+    for e in dados:
+        print("\n------------------")
+        print("Nome:", e[0])
+        print("CPF (criptografado):", e[1])
+        print("Título:", e[2])
+        print("Mesário:", "Sim" if e[3] else "Não")
+        print("Status:", e[4])
 
 
-def remover_eleitor():  # função para remover um eleitor do sistema
-    print("\n=== REMOVER ELEITOR ===")  # mostra o título da remoção
 
-    cpf = input("CPF: ")  # lê o CPF do eleitor a ser removido
+def buscar_eleitor():
+    print("\n=== BUSCAR ELEITOR ===")
 
-    sql = "SELECT * FROM eleitores WHERE cpf = %s"  # comando SQL para verificar se existe eleitor com esse CPF
-    cursor.execute(sql, (cpf,))  # executa o SELECT passando o CPF
+    valor = input("CPF ou Título: ").strip()
 
-    if not cursor.fetchone():  # se não encontrou eleitor com esse CPF
-        print("Eleitor não encontrado.")  # informa que não existe
-        return  # sai da função
+    # Remove tudo que não é número
+    somente_numeros = re.sub(r"\D", "", valor)
 
-    confirm = input("Confirmar remoção? (s/n): ")  # pede confirmação antes de remover
+    # CASO 1: CPF (11 dígitos)
+    if len(somente_numeros) == 11:
+        cpf_criptografado = criptografar_cpf(somente_numeros)
 
-    if confirm != "s":  # se não confirmar com "s"
-        return  # cancela a remoção
+        sql = """
+        SELECT nome, cpf, titulo_eleitor, mesario, status_voto
+        FROM eleitores
+        WHERE cpf = %s
+        """
+        cursor.execute(sql, (cpf_criptografado,))
 
-    sql = "DELETE FROM eleitores WHERE cpf = %s"  # comando SQL para deletar o eleitor pelo CPF
-    cursor.execute(sql, (cpf,))  # executa o DELETE passando o CPF
-    conexao.commit()  # confirma a remoção no banco
 
-    print("Removido com sucesso.")  # mensagem de sucesso
+    # CASO 2: Título de eleitor
+    else:
+        sql = """
+        SELECT nome, cpf, titulo_eleitor, mesario, status_voto
+        FROM eleitores
+        WHERE titulo_eleitor = %s
+        """
+        cursor.execute(sql, (somente_numeros,))
+
+    e = cursor.fetchone()
+
+    if not e:
+        print("Eleitor não encontrado.")
+        return
+
+    print("\n=== ELEITOR ENCONTRADO ===")
+    print("Nome:", e[0])
+    print("CPF (criptografado):", e[1])
+    print("Título:", e[2])
+    print("Mesário:", "Sim" if e[3] else "Não")
+    print("Status:", e[4])
+
+
+def remover_eleitor():
+    print("\n=== REMOVER ELEITOR ===")
+
+    cpf = input("CPF: ").strip()
+
+    # Limpa CPF (remove pontos, traços etc.)
+    cpf_limpo = re.sub(r"\D", "", cpf)
+
+    # Verificação básica
+    if len(cpf_limpo) != 11:
+        print("CPF inválido.")
+        return
+
+    # Criptografa para comparar com o banco
+    cpf_criptografado = criptografar_cpf(cpf_limpo)
+
+    # Verifica se existe
+    sql = "SELECT nome FROM eleitores WHERE cpf = %s"
+    cursor.execute(sql, (cpf_criptografado,))
+    eleitor = cursor.fetchone()
+
+    if not eleitor:
+        print("Eleitor não encontrado.")
+        return
+
+    print(f"Eleitor encontrado: {eleitor[0]}")
+    confirm = input("Confirmar remoção? (s/n): ").strip().lower()
+
+    if confirm != "s":
+        print("Remoção cancelada.")
+        return
+
+    # Remove do banco
+    sql = "DELETE FROM eleitores WHERE cpf = %s"
+    cursor.execute(sql, (cpf_criptografado,))
+    conexao.commit()
+
+    print("Eleitor removido com sucesso.")
