@@ -1,6 +1,7 @@
 import random  # importa o módulo random para gerar valores aleatórios
 from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
-
+from utils.validacoes import validar_cpf, validar_titulo_eleitor, validar_documentos  # importa as funções de validação de CPF e título de eleitor
+from utils.criptografia import criptografar_cpf # Impporta a função de criptografia de cpf.
 
 def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
     partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
@@ -18,6 +19,19 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
     cpf = input("CPF: ")  # lê o CPF do eleitor
     titulo = input("Título de eleitor: ")  # lê o título de eleitor
     mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
+
+    
+    #validação matematica
+    if not validar_cpf(cpf):
+        print("CPF inválido.") #Informa que o cpf não é válido.
+        return #Sai da função sem cadastrar.
+    
+    if not validar_titulo_eleitor(titulo):
+        print("Título de eleitor inválido.")# Informa que o título de eleitor não é válido.
+        return #Sai da função sem cadastrar.
+
+    #criptografia do cpf
+    cpf_criptografado = criptografar_cpf(cpf) # Chama a função de criptografia do CPF e armazena o resultado.
 
     # verifica duplicidade
     sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"  # comando SQL para verificar se CPF ou título já existem
@@ -38,7 +52,7 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
     VALUES (%s, %s, %s, %s, %s)
     """
 
-    cursor.execute(sql, (nome, cpf, titulo, mesario, chave))  # executa o INSERT com os dados do eleitor
+    cursor.execute(sql, (nome, cpf_criptografado, titulo, mesario, chave))  # executa o INSERT com os dados do eleitor
     conexao.commit()  # confirma a inserção no banco de dados
 
     print("\nEleitor cadastrado com sucesso!")  # mensagem de sucesso

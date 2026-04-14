@@ -19,7 +19,7 @@ def main():  # função principal do sistema
 
         elif op == "0":  # se a opção for 0
             print("Saindo...")  # mensagem de saída
-
+            break
         else:  # se a opção for inválida
             print("Opção inválida.")  # informa erro de opção
 
