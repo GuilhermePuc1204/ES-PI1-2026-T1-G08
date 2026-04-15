@@ -29,15 +29,15 @@ Segurança através de criptografia e validação de dados
 
 Integrantes do Projeto 
 
-Felipe Oliveira Barbosa  
+Felipe Oliveira Barbosa  26001377
 
-Fernando Munhoz Molinari  
+Fernando Munhoz Molinari  26000061
 
-Guilherme Henrique Lopes Zambuzi  
+Guilherme Henrique Lopes Zambuzi  26003006
 
-Murilo Henrique Giaretta Apolinario  
+Murilo Henrique Giaretta Apolinario  22002255
 
-Nathan Kenzo Puzipe 
+Nathan Kenzo Puzipe 26002229
 
 ️ Tecnologias Utilizadas 
 
@@ -235,5 +235,5 @@ Verifique os dígitos verificadores (Anexo A e B do requisito)
 Este projeto é desenvolvido para fins acadêmicos exclusivamente. 
  
 
-Última atualização: 07 de abril de 2026 
+Última atualização: 15 de abril de 2026 
  
