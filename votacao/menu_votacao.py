@@ -1,3 +1,5 @@
+from votacao.resultados import menu_resultados
+
 def menu_votacao():
 
     op = -1
@@ -18,7 +20,7 @@ def menu_votacao():
             print("Abrindo auditoria...")
 
         elif op == "3":
-            print("Mostrando resultados...")
+            menu_resultados()
 
         elif op == "0":
             print("Voltando...")
