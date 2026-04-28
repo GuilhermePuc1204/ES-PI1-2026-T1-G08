@@ -1,5 +1,5 @@
 from gerenciamento.menu_gerenciamento import menu_gerenciamento  # importa a função do menu de gerenciamento
-
+from votacao.menu_votacao import menu_votacao  # importa a função do menu de votação
 
 def main():  # função principal do sistema
     op=1
@@ -15,7 +15,7 @@ def main():  # função principal do sistema
             menu_gerenciamento()  # chama o menu de gerenciamento
 
         elif op == "2":  # se a opção for 2
-            print("\nMódulo de votação ainda não implementado.")  # informa que a votação não foi implementada
+            menu_votacao()  # chama o menu de votação
 
         elif op == "0":  # se a opção for 0
             print("Saindo...")  # mensagem de saída
