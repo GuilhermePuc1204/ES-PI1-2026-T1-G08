@@ -6,7 +6,7 @@ import mysql.connector
 conexao = mysql.connector.connect(
     host="localhost",        # Endereço do servidor do banco
     user="root",             # Usuário do banco de dados
-    password="",       # Senha do banco de dados
+    password="root123@",       # Senha do banco de dados
     database="sistema_votacao" # Nome do banco de dados que será utilizado
 )
 
