@@ -1,164 +1,74 @@
-"""
-Módulo: eleitores.py
+import random  # importa o módulo random para gerar valores aleatórios
+import re  # importa o módulo re para expressões regulares
+from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
+from utils.validacoes import validar_cpf, validar_titulo_eleitor  # importa as funções de validação de CPF e título de eleitor
+from utils.criptografia import criptografar_cpf, criptografar_chave_acesso 
 
-Responsabilidade:
-Este módulo implementa todas as funcionalidades do Módulo de Gerenciamento
-relacionadas aos eleitores, conforme os requisitos RF001 do projeto.
+def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
+    partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
 
-Funções principais:
-- Cadastro de eleitores com validação, unicidade e criptografia
-- Listagem de eleitores cadastrados
-- Busca de eleitor por CPF ou Título
-- Remoção de eleitor
+    if len(partes) < 2:  # verifica se o nome tem pelo menos 2 partes (ex: nome e sobrenome)
+        return None  # retorna None indicando que não é possível gerar a chave
 
-Aspectos de segurança:
-- CPF e chave de acesso são criptografados antes de serem persistidos (RNF006)
-- Nenhuma informação sensível é armazenada em texto claro no banco de dados
-"""
-
-import random  # Utilizado para geração de números aleatórios na chave de acesso
-import re      # Utilizado para normalização de entradas (expressões regulares)
-
-from database.conexao import conexao, cursor
-from utils.validacoes import validar_cpf, validar_titulo_eleitor
-from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
+    return partes[0][:2] + partes[1][0] + str(random.randint(1000, 9999))  # monta a chave: 2 letras do 1º nome + 1 letra do 2º + número aleatório
 
 
-# ==========================================================
-# GERAÇÃO DA CHAVE DE ACESSO DO ELEITOR
-# ==========================================================
-def gerar_chave(nome):
-    """
-    Gera a chave de acesso do eleitor conforme especificação do projeto.
+def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
+    print("\n=== CADASTRO DE ELEITOR ===")  # mostra o título da tela de cadastro
 
-    Regra de formação:
-    - 2 primeiras letras do primeiro nome
-    - 1ª letra do segundo nome
-    - 4 dígitos aleatórios
+    nome = input("Nome completo: ")  # lê o nome completo do eleitor
 
-    Exemplo:
-        Nome: André Silva
-        Chave gerada: ANS4821
-
-    Args:
-        nome (str): Nome completo do eleitor.
-
-    Returns:
-        str | None: Chave gerada ou None caso o nome seja inválido.
-    """
-
-    # Converte o nome para maiúsculas e separa por espaços
-    partes = nome.upper().split()
-
-    # Exige pelo menos nome e sobrenome
-    if len(partes) < 2:
-        return None
-
-    # Monta a chave conforme o padrão definido
-    return partes[0][:2] + partes[1][0] + str(random.randint(1000, 9999))
-
-
-# ==========================================================
-# CADASTRO DE ELEITOR (RF001.01 / RF001.02 / RF001.03)
-# ==========================================================
-def cadastrar_eleitor():
-    """
-    Realiza o cadastro de um novo eleitor no sistema.
-
-    Etapas do processo:
-    1. Leitura dos dados de entrada
-    2. Normalização dos documentos
-    3. Validação matemática do CPF e do Título
-    4. Criptografia do CPF
-    5. Verificação de unicidade no banco
-    6. Geração e criptografia da chave de acesso
-    7. Inserção do eleitor no banco de dados
-    """
-
-    print("\n=== CADASTRO DE ELEITOR ===")
-
-    # -----------------------------
-    # ENTRADA DE DADOS
-    # -----------------------------
-    nome = input("Nome completo: ").strip()
-    cpf = input("CPF: ").strip()
-    titulo = input("Título de eleitor: ").strip()
-    mesario = input("É mesário? (s/n): ").strip().lower() == "s"
-
-    # -----------------------------
-    # NORMALIZAÇÃO DOS DOCUMENTOS
-    # Remove qualquer caractere que não seja numérico
-    # -----------------------------
-    cpf = re.sub(r"\D", "", cpf)
-    titulo = re.sub(r"\D", "", titulo)
-
-    # -----------------------------
-    # VALIDAÇÃO MATEMÁTICA (RF001.02)
-    # -----------------------------
+    cpf = input("CPF: ")  # lê o CPF do eleitor
     if not validar_cpf(cpf):
         print("CPF inválido.")
         return
 
+    print("CPF válido.")
+
+    titulo = input("Título de eleitor: ")  # lê o título de eleitor
     if not validar_titulo_eleitor(titulo):
         print("Título de eleitor inválido.")
         return
 
-    # -----------------------------
-    # CRIPTOGRAFIA DO CPF (RNF006)
-    # -----------------------------
-    cpf_criptografado = criptografar_cpf(cpf)
+    print("Título de eleitor válido.")
 
-    # -----------------------------
-    # VERIFICAÇÃO DE UNICIDADE (RF001.03)
-    # Comparação feita com CPF já criptografado
-    # -----------------------------
-    sql = "SELECT 1 FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"
-    cursor.execute(sql, (cpf_criptografado, titulo))
+    mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
-    if cursor.fetchone():
-        print("CPF ou título já cadastrado.")
-        return
+    #criptografia do cpf
+    cpf_criptografado = criptografar_cpf(cpf) # Chama a função de criptografia do CPF e armazena o resultado.
 
-    # -----------------------------
-    # GERAÇÃO E CRIPTOGRAFIA DA CHAVE DE ACESSO
-    # -----------------------------
-    chave = gerar_chave(nome)
+    # verifica duplicidade
+    sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"  # comando SQL para verificar se CPF ou título já existem
+    cursor.execute(sql, (cpf, titulo))  # executa o SELECT passando cpf e título como parâmetros
 
-    if not chave:
-        print("Nome inválido.")
-        return
+    if cursor.fetchone():  # se encontrou algum registro com o CPF ou título informado
+        print("CPF ou título já cadastrado.")  # informa duplicidade
+        return  # sai da função sem cadastrar
 
+    chave = gerar_chave(nome)  # gera a chave de acesso a partir do nome
+
+    if not chave:  # se a chave não foi gerada (ex: nome inválido)
+        print("Nome inválido.")  # informa que o nome não permitiu gerar chave
+        return  # sai da função
+    
+    
+    # Criptografia da chave de acesso (RNF006)
     chave_criptografada = criptografar_chave_acesso(chave)
 
-    # -----------------------------
-    # INSERÇÃO NO BANCO DE DADOS
-    # -----------------------------
-    sql = """
+
+    sql = """  # comando SQL para inserir um novo eleitor
     INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
     VALUES (%s, %s, %s, %s, %s)
     """
-    cursor.execute(
-        sql,
-        (nome, cpf_criptografado, titulo, mesario, chave_criptografada)
-    )
-    conexao.commit()
 
-    print("\nEleitor cadastrado com sucesso!")
-    print("Chave de acesso (guarde):", chave)
+    cursor.execute(sql, (nome, cpf_criptografado, titulo, mesario, chave_criptografada))  # executa o INSERT com os dados do eleitor
+    conexao.commit()  # confirma a inserção no banco de dados
+
+    print("\nEleitor cadastrado com sucesso!")  # mensagem de sucesso
+    print("Chave:", chave)  # exibe a chave de acesso gerada
 
 
-# ==========================================================
-# LISTAGEM DE ELEITORES (RF001.08)
-# ==========================================================
 def listar_eleitores():
-    """
-    Lista todos os eleitores cadastrados no sistema.
-
-    Observação:
-    - O CPF é exibido de forma criptografada, conforme requisitos de segurança.
-    - A chave de acesso não é exibida por se tratar de dado sensível.
-    """
-
     print("\n=== LISTA DE ELEITORES ===")
 
     sql = """
@@ -181,31 +91,28 @@ def listar_eleitores():
         print("Status:", e[4])
 
 
-# ==========================================================
-# BUSCA DE ELEITOR (RF001.07)
-# ==========================================================
+
 def buscar_eleitor():
-    """
-    Busca um eleitor pelo CPF ou pelo Título de Eleitor.
-
-    Regras:
-    - Se a entrada possuir 11 dígitos, considera-se CPF
-    - Caso contrário, considera-se Título de Eleitor
-    """
-
     print("\n=== BUSCAR ELEITOR ===")
 
     valor = input("CPF ou Título: ").strip()
+
+    # Remove tudo que não é número
     somente_numeros = re.sub(r"\D", "", valor)
 
+    # CASO 1: CPF (11 dígitos)
     if len(somente_numeros) == 11:
         cpf_criptografado = criptografar_cpf(somente_numeros)
+
         sql = """
         SELECT nome, cpf, titulo_eleitor, mesario, status_voto
         FROM eleitores
         WHERE cpf = %s
         """
         cursor.execute(sql, (cpf_criptografado,))
+
+
+    # CASO 2: Título de eleitor
     else:
         sql = """
         SELECT nome, cpf, titulo_eleitor, mesario, status_voto
@@ -228,28 +135,23 @@ def buscar_eleitor():
     print("Status:", e[4])
 
 
-# ==========================================================
-# REMOÇÃO DE ELEITOR (RF001.06)
-# ==========================================================
 def remover_eleitor():
-    """
-    Remove um eleitor do sistema a partir do CPF.
-
-    O CPF informado é normalizado e criptografado antes
-    de ser utilizado na consulta e remoção no banco.
-    """
-
     print("\n=== REMOVER ELEITOR ===")
 
     cpf = input("CPF: ").strip()
+
+    # Limpa CPF (remove pontos, traços etc.)
     cpf_limpo = re.sub(r"\D", "", cpf)
 
+    # Verificação básica
     if len(cpf_limpo) != 11:
         print("CPF inválido.")
         return
 
+    # Criptografa para comparar com o banco
     cpf_criptografado = criptografar_cpf(cpf_limpo)
 
+    # Verifica se existe
     sql = "SELECT nome FROM eleitores WHERE cpf = %s"
     cursor.execute(sql, (cpf_criptografado,))
     eleitor = cursor.fetchone()
@@ -265,6 +167,7 @@ def remover_eleitor():
         print("Remoção cancelada.")
         return
 
+    # Remove do banco
     sql = "DELETE FROM eleitores WHERE cpf = %s"
     cursor.execute(sql, (cpf_criptografado,))
     conexao.commit()
