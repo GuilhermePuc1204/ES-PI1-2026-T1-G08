@@ -1,7 +1,7 @@
 import random  # importa o módulo random para gerar valores aleatórios
 import re  # importa o módulo re para expressões regulares
 from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
-from utils.validacoes import validar_cpf, validar_titulo_eleitor, validar_documentos  # importa as funções de validação de CPF e título de eleitor
+from utils.validacoes import validar_cpf, validar_titulo_eleitor  # importa as funções de validação de CPF e título de eleitor
 from utils.criptografia import criptografar_cpf # Impporta a função de criptografia de cpf.
 from utils.criptografia import criptografar_chave_acesso # Importa a função de criptografia da chave de acesso.
 
@@ -18,19 +18,22 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
     print("\n=== CADASTRO DE ELEITOR ===")  # mostra o título da tela de cadastro
 
     nome = input("Nome completo: ")  # lê o nome completo do eleitor
-    cpf = input("CPF: ")  # lê o CPF do eleitor
-    titulo = input("Título de eleitor: ")  # lê o título de eleitor
-    mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
-    
-    #validação matematica
+    cpf = input("CPF: ")  # lê o CPF do eleitor
     if not validar_cpf(cpf):
-        print("CPF inválido.") #Informa que o cpf não é válido.
-        return #Sai da função sem cadastrar.
-    
+        print("CPF inválido.")
+        return
+
+    print("CPF válido.")
+
+    titulo = input("Título de eleitor: ")  # lê o título de eleitor
     if not validar_titulo_eleitor(titulo):
-        print("Título de eleitor inválido.")# Informa que o título de eleitor não é válido.
-        return #Sai da função sem cadastrar.
+        print("Título de eleitor inválido.")
+        return
+
+    print("Título de eleitor válido.")
+
+    mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
     #criptografia do cpf
     cpf_criptografado = criptografar_cpf(cpf) # Chama a função de criptografia do CPF e armazena o resultado.

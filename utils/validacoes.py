@@ -1,6 +1,4 @@
 import re
-import mysql.connector
-from mysql.connector import Error
 
 # Função para validar formato e dígitos do CPF
 def validar_cpf(cpf):
@@ -75,34 +73,3 @@ def validar_titulo_eleitor(titulo):
         dv2 = resto2
 
     return dv_informados == f"{dv1}{dv2}"
-
-def validar_documentos(cpf, titulo):
-    """
-    Validação completa de CPF e Título:
-    - formato
-    - cálculo matemático
-    - unicidade no banco
-
-    Returns:
-        tuple(bool, str): status e mensagem
-    """
-    conexao = conectar_mysql()
-    if not conexao:
-        return False, "Erro de conexão com o banco"
-
-    cpf_limpo = re.sub(r'\D', '', cpf)
-    titulo_limpo = re.sub(r'\D', '', titulo)
-
-    if not validar_cpf(cpf_limpo):
-        return False, "CPF inválido"
-
-    if not validar_titulo_eleitor(titulo_limpo):
-        return False, "Título de eleitor inválido"
-
-    if cpf_existe(cpf_limpo, conexao):
-        return False, "CPF já cadastrado"
-
-    if titulo_existe(titulo_limpo, conexao):
-        return False, "Título já cadastrado"
-
-    return True, "Documentos válidos"
