@@ -1,3 +1,4 @@
+from votacao.abertura import abrir_votacao
 from votacao.resultados import menu_resultados
 
 def menu_votacao():
@@ -14,7 +15,7 @@ def menu_votacao():
         op = input("Escolha: ")
 
         if op == "1":
-            print("Abrindo sistema de votação...")
+            abrir_votacao()
 
         elif op == "2":
             print("Abrindo auditoria...")
