@@ -1,20 +1,3 @@
-"""
-Módulo: criptografia.py
-
-Responsabilidade:
-Este módulo implementa os mecanismos de criptografia utilizados pelo sistema,
-atendendo ao Requisito Não Funcional RNF006 do projeto.
-
-São criptografados:
-- CPF do eleitor
-- Chave de acesso do eleitor
-- (Posteriormente) protocolo de votação
-
-Observação importante:
-O método utilizado é a Cifra de Hill, aplicada com finalidade
-estritamente didática, conforme especificado no documento do projeto.
-"""
-
 # ==========================================================
 # DEFINIÇÃO DOS ALFABETOS E MATRIZ-CHAVE
 # ==========================================================

@@ -3,6 +3,8 @@ import re  # importa o módulo re para expressões regulares
 from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
 from utils.validacoes import validar_cpf, validar_titulo_eleitor  # importa as funções de validação de CPF e título de eleitor
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso 
+from utils.descriptografia import descriptografar_cpf
+
 
 def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
     partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
@@ -127,9 +129,12 @@ def buscar_eleitor():
         print("Eleitor não encontrado.")
         return
 
+    cpf_original= descriptografar_cpf(e[1])  # Descriptografa o CPF para exibir o valor original
+    cpf_formatado = f"{cpf_original[:3]}.{cpf_original[3:6]}.{cpf_original[6:9]}-{cpf_original[9:11]}"  # Formata o CPF para exibição
+
     print("\n=== ELEITOR ENCONTRADO ===")
     print("Nome:", e[0])
-    print("CPF (criptografado):", e[1])
+    print("CPF :", cpf_formatado)
     print("Título:", e[2])
     print("Mesário:", "Sim" if e[3] else "Não")
     print("Status:", e[4])
