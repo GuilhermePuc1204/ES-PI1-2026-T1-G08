@@ -53,6 +53,30 @@ def boletim_urna():
         "Resultados exibidos"
     )
 
+def estatisticas_comparecimento():
+
+    print("\n=== ESTATÍSTICAS DE COMPARECIMENTO ===")
+
+    cursor.execute("SELECT COUNT(*) FROM eleitores")
+    total_eleitores = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM eleitores WHERE status_voto = 'JA_VOTOU'"
+    )
+
+    total_votaram = cursor.fetchone()[0]
+
+    total_ausentes = total_eleitores - total_votaram
+
+    porcentagem = 0
+
+    if total_eleitores > 0:
+        porcentagem = (total_votaram / total_eleitores) * 100
+
+    print(f"Total de eleitores: {total_eleitores}")
+    print(f"Compareceram: {total_votaram}")
+    print(f"Ausentes: {total_ausentes}")
+    print(f"Percentual de comparecimento: {porcentagem:.2f}%")
 
 def menu_resultados():
 
@@ -72,7 +96,7 @@ def menu_resultados():
             boletim_urna()
 
         elif op == "2":
-            print("\nEstatísticas de Comparecimento (em desenvolvimento)")
+            print(estatisticas_comparecimento())
 
         elif op == "3":
             print("\nVotos por Partido (em desenvolvimento)")
