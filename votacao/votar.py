@@ -3,6 +3,7 @@ from datetime import datetime
 import random
 import string
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
+from utils.auditoria import registrar_evento
 
 
 def gerar_protocolo(numero):
@@ -83,6 +84,20 @@ def votar():
     )
 
     conexao.commit()
+
+    # EVENTO AUDITÁVEL: VOTO REGISTRADO
+    registrar_evento(
+        "VOTO_REGISTRADO",
+        "Voto computado com sucesso"
+    )
+
+    
+    # EVENTO AUDITÁVEL: STATUS DE VOTO ATUALIZADO
+    registrar_evento(
+        "STATUS_VOTO_ATUALIZADO",
+        "Eleitor teve status de voto atualizado"
+    )
+
 
     print("\nVoto registrado com sucesso!")
     print(f"Protocolo: {protocolo}")

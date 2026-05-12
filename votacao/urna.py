@@ -1,5 +1,5 @@
 from votacao.votar import votar
-
+from utils.auditoria import registrar_evento
 def menu_urna():
 
     op = -1
@@ -16,6 +16,12 @@ def menu_urna():
             votar()
 
         elif op == "2":
+            # EVENTO AUDITÁVEL: ENCERRAMENTO DA URNA
+            registrar_evento(
+                "ENCERRAMENTO_URNA",
+                "Urna encerrada"
+            )
+
             print("Votação encerrada (teste).")
             break
 

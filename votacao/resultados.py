@@ -1,7 +1,14 @@
 from database.conexao import cursor
+from utils.auditoria import registrar_evento
 
 
 def boletim_urna():
+
+    # EVENTO AUDITÁVEL: INÍCIO DA APURAÇÃO
+    registrar_evento(
+        "APURACAO_INICIADA",
+        "Apuração iniciada"
+    )
 
     print("\n=== BOLETIM DE URNA ===")
 
@@ -40,7 +47,12 @@ def boletim_urna():
         print(f"Partido: {vencedor[2]}")
         print(f"Total: {maior} votos")
 
- 
+    # EVENTO AUDITÁVEL: RESULTADOS EXIBIDOS
+    registrar_evento(
+        "RESULTADOS_EXIBIDOS",
+        "Resultados exibidos"
+    )
+
 
 def menu_resultados():
 
