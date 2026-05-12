@@ -16,7 +16,7 @@ def menu_urna():
             votar()
 
         elif op == "2":
-            print("Votação encerrada (simulação).")
+            print("Votação encerrada (teste).")
             break
 
         elif op == "0":

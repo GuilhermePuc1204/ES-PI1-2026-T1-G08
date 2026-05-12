@@ -1,5 +1,6 @@
 from database.conexao import cursor
 
+
 def boletim_urna():
 
     print("\n=== BOLETIM DE URNA ===")
@@ -15,6 +16,10 @@ def boletim_urna():
     cursor.execute(sql)
     resultados = cursor.fetchall()
 
+    if not resultados:
+        print("Nenhum resultado encontrado.")
+        return
+
     maior = 0
     vencedor = None
 
@@ -22,7 +27,7 @@ def boletim_urna():
         nome, numero, partido, total = r
         total = total if total else 0
 
-        print(f"{nome} - {total} votos")
+        print(f"{nome} - {total} voto{'s' if total != 1 else ''}")
 
         if total > maior:
             maior = total
@@ -35,6 +40,7 @@ def boletim_urna():
         print(f"Partido: {vencedor[2]}")
         print(f"Total: {maior} votos")
 
+ 
 
 def menu_resultados():
 
