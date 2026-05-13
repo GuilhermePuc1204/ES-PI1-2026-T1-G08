@@ -1,5 +1,6 @@
 from votacao.abertura import abrir_votacao
 from votacao.resultados import menu_resultados
+from utils.auditoria import visualizar_auditoria
 
 def menu_votacao():
 
@@ -18,7 +19,7 @@ def menu_votacao():
             abrir_votacao()
 
         elif op == "2":
-            print("Abrindo auditoria...")
+            visualizar_auditoria()
 
         elif op == "3":
             menu_resultados()

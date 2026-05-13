@@ -1,0 +1,3 @@
+13/05/2026 08:53:41 | LOGIN_MESARIO_FALHA | Chave de acesso do mesário incorreta
+13/05/2026 08:55:24 | APURACAO_INICIADA | Apuração iniciada
+13/05/2026 08:55:24 | RESULTADOS_EXIBIDOS | Resultados exibidos
