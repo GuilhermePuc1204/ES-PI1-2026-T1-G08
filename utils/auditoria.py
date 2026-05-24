@@ -17,6 +17,12 @@ def registrar_evento(acao, descricao):
 
 
 def visualizar_auditoria():
+    
+    registrar_evento(
+        "AUDITORIA_ACESSADA",
+        "Auditoria visualizada"
+    )
+
     print("\n=== AUDITORIA DO SISTEMA ===")
 
     try:

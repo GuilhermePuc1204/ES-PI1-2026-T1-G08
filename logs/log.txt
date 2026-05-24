@@ -1,6 +1,30 @@
-[2026-05-24 15:35:44] LOGIN_MESARIO_FALHA: Tentativa de abertura de urna com título inexistente
-[2026-05-24 15:40:27] LOGIN_MESARIO: Mesário autenticado com sucesso
-[2026-05-24 15:40:27] ABERTURA_URNA: Urna aberta pelo mesário
-[2026-05-24 15:40:27] ZERESIMA: Zerésima emitida com sucesso
-[2026-05-24 15:41:34] VOTO_REGISTRADO: Voto computado com sucesso
-[2026-05-24 15:41:34] STATUS_VOTO_ATUALIZADO: Eleitor teve status de voto atualizado
+24/05/2026 19:20:09 | LOGIN_MESARIO_FALHA | Tentativa de abertura de urna com título inexistente
+24/05/2026 19:23:24 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:23:24 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:23:24 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:23:52 | ALERTA | Tentativa de acesso negado
+24/05/2026 19:27:03 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:27:03 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:27:03 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:31:15 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:31:15 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:31:15 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:31:28 | ENCERRAMENTO_URNA | Votação finalizada com sucesso
+24/05/2026 19:32:02 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:32:02 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:32:02 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:32:15 | ENCERRAMENTO_URNA | Votação finalizada com sucesso
+24/05/2026 19:35:04 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:35:04 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:35:04 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:35:19 | ENCERRAMENTO_URNA | Votação finalizada com sucesso
+24/05/2026 19:36:45 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:36:45 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:36:45 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:37:00 | LOGIN_MESARIO | Mesário autenticado com sucesso
+24/05/2026 19:37:00 | ABERTURA_URNA | Urna aberta pelo mesário
+24/05/2026 19:37:00 | ZERESIMA | Zerésima emitida com sucesso
+24/05/2026 19:37:19 | ENCERRAMENTO_URNA | Votação finalizada com sucesso
+24/05/2026 19:37:33 | AUDITORIA_ACESSADA | Auditoria visualizada
+24/05/2026 19:37:49 | APURACAO_INICIADA | Apuração iniciada
+24/05/2026 19:37:50 | RESULTADOS_EXIBIDOS | Resultados exibidos

@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from database.conexao import conexao, cursor
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
@@ -9,14 +10,32 @@ def abrir_votacao():
     print("\n=== ABERTURA DO SISTEMA DE VOTAÇÃO ===")
 
     titulo = input("Título de eleitor do mesário: ").strip()
+    titulo_limpo = re.sub(r"\D", "", titulo)
 
+    if len(titulo_limpo) < 4:
+        print("Digite pelo menos 4 números do título.")
+        registrar_evento(
+            "LOGIN_MESARIO_FALHA",
+            "Título do mesário informado com menos de 4 dígitos"
+        )
+        return
+
+    # Busca todos os eleitores
     cursor.execute(
-        "SELECT id, nome, cpf, mesario, chave_acesso FROM eleitores WHERE titulo_eleitor = %s",
-        (titulo,)
+        "SELECT id, nome, cpf, titulo_eleitor, mesario, chave_acesso FROM eleitores"
     )
-    eleitor = cursor.fetchone()
+    eleitores = cursor.fetchall()
 
-    if not eleitor:
+    encontrados = []
+
+    # Filtra pelo prefixo do título
+    for e in eleitores:
+        id_eleitor, nome, cpf_criptografado, titulo_eleitor, mesario, chave_armazenada = e
+
+        if titulo_eleitor.startswith(titulo_limpo[:4]):
+            encontrados.append(e)
+
+    if not encontrados:
         print("Mesário não encontrado.")
         registrar_evento(
             "LOGIN_MESARIO_FALHA",
@@ -24,7 +43,16 @@ def abrir_votacao():
         )
         return
 
-    id_eleitor, nome, cpf_criptografado, mesario, chave_armazenada = eleitor
+    if len(encontrados) > 1:
+        print("Mais de um mesário encontrado. Use o título completo.")
+        registrar_evento(
+            "LOGIN_MESARIO_FALHA",
+            "Tentativa de abertura de urna com título ambíguo"
+        )
+        return
+
+    # Apenas um eleitor encontrado
+    id_eleitor, nome, cpf_criptografado, titulo_eleitor, mesario, chave_armazenada = encontrados[0]
 
     if not mesario:
         print("Eleitor não é mesário.")
@@ -64,12 +92,11 @@ def abrir_votacao():
 
     print(f"\nMesário autenticado: {nome}")
 
-    # EVENTO AUDITÁVEL: LOGIN DO MESÁRIO (SUCESSO)
     registrar_evento(
         "LOGIN_MESARIO",
         "Mesário autenticado com sucesso"
     )
-    # EVENTO AUDITÁVEL: ABERTURA DA URNA
+
     registrar_evento(
         "ABERTURA_URNA",
         "Urna aberta pelo mesário"
@@ -82,7 +109,6 @@ def abrir_votacao():
     cursor.execute("UPDATE eleitores SET status_voto = 'NAO_VOTOU'")
     conexao.commit()
 
-    # EVENTO AUDITÁVEL: ZERÉSIMA
     registrar_evento(
         "ZERESIMA",
         "Zerésima emitida com sucesso"

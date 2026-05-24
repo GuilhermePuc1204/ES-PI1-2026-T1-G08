@@ -4,7 +4,7 @@ from database.conexao import conexao, cursor  # importa a conexão e o cursor do
 from utils.validacoes import validar_cpf, validar_titulo_eleitor  # importa as funções de validação de CPF e título de eleitor
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso 
 from utils.descriptografia import descriptografar_cpf
-
+from utils.auditoria import registrar_evento
 
 def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
     partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
@@ -68,6 +68,11 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
 
     print("\nEleitor cadastrado com sucesso!")  # mensagem de sucesso
     print("Chave:", chave)  # exibe a chave de acesso gerada
+    
+    registrar_evento(
+        "CADASTRO_ELEITOR",
+        "Eleitor cadastrado com sucesso"
+    )
 
 
 def listar_eleitores():
@@ -100,84 +105,129 @@ def listar_eleitores():
 def buscar_eleitor():
     print("\n=== BUSCAR ELEITOR ===")
 
-    valor = input("CPF ou Título: ").strip()
+    valor = input("Digite CPF ou Título: ").strip()
 
-    # Remove tudo que não é número
     somente_numeros = re.sub(r"\D", "", valor)
 
-    # CASO 1: CPF (11 dígitos)
-    if len(somente_numeros) == 11:
-        cpf_criptografado = criptografar_cpf(somente_numeros)
-
-        sql = """
-        SELECT nome, cpf, titulo_eleitor, mesario, status_voto
-        FROM eleitores
-        WHERE cpf = %s
-        """
-        cursor.execute(sql, (cpf_criptografado,))
-
-
-    # CASO 2: Título de eleitor
-    else:
-        sql = """
-        SELECT nome, cpf, titulo_eleitor, mesario, status_voto
-        FROM eleitores
-        WHERE titulo_eleitor = %s
-        """
-        cursor.execute(sql, (somente_numeros,))
-
-    e = cursor.fetchone()
-
-    if not e:
-        print("Eleitor não encontrado.")
+    if len(somente_numeros) < 4:
+        print("Digite pelo menos 4 números.")
         return
 
-    cpf_original= descriptografar_cpf(e[1])  # Descriptografa o CPF para exibir o valor original
-    cpf_formatado = f"{cpf_original[:3]}.{cpf_original[3:6]}.{cpf_original[6:9]}-{cpf_original[9:11]}"  # Formata o CPF para exibição
+    cursor.execute(
+        "SELECT nome, cpf, titulo_eleitor, mesario, status_voto FROM eleitores"
+    )
+    eleitores = cursor.fetchall()
 
-    print("\n=== ELEITOR ENCONTRADO ===")
-    print("Nome:", e[0])
-    print("CPF :", cpf_formatado)
-    print("Título:", e[2])
-    print("Mesário:", "Sim" if e[3] else "Não")
-    print("Status:", e[4])
+    cpf_prefixo_criptografado = criptografar_cpf(somente_numeros[:4])
 
+    for e in eleitores:
+        cpf_criptografado = e[1]
+
+        # compara prefixo criptografado
+        if cpf_criptografado.startswith(cpf_prefixo_criptografado):
+            cpf_original = descriptografar_cpf(cpf_criptografado)
+            cpf_formatado = (
+                f"{cpf_original[:3]}."
+                f"{cpf_original[3:6]}."
+                f"{cpf_original[6:9]}-"
+                f"{cpf_original[9:11]}"
+            )
+
+            print("\n=== ELEITOR ENCONTRADO ===")
+            print("Nome:", e[0])
+            print("CPF:", cpf_formatado)
+            print("Título:", e[2])
+            print("Mesário:", "Sim" if e[3] else "Não")
+            print("Status:", e[4])
+            return
+
+
+    cursor.execute(
+        """
+        SELECT nome, cpf, titulo_eleitor, mesario, status_voto
+        FROM eleitores
+        WHERE titulo_eleitor LIKE %s
+        """,
+        (somente_numeros + "%",)
+    )
+    e = cursor.fetchone()
+
+    if e:
+        cpf_original = descriptografar_cpf(e[1])
+        cpf_formatado = (
+            f"{cpf_original[:3]}."
+            f"{cpf_original[3:6]}."
+            f"{cpf_original[6:9]}-"
+            f"{cpf_original[9:11]}"
+        )
+
+        print("\n=== ELEITOR ENCONTRADO ===")
+        print("Nome:", e[0])
+        print("CPF:", cpf_formatado)
+        print("Título:", e[2])
+        print("Mesário:", "Sim" if e[3] else "Não")
+        print("Status:", e[4])
+        return
+
+    print("Eleitor não encontrado.")
 
 def remover_eleitor():
     print("\n=== REMOVER ELEITOR ===")
 
-    cpf = input("CPF: ").strip()
-
-    # Limpa CPF (remove pontos, traços etc.)
+    cpf = input("Digite o CPF: ").strip()
     cpf_limpo = re.sub(r"\D", "", cpf)
 
-    # Verificação básica
-    if len(cpf_limpo) != 11:
-        print("CPF inválido.")
+    if len(cpf_limpo) < 4:
+        print("Digite pelo menos 4 números do CPF.")
         return
 
-    # Criptografa para comparar com o banco
-    cpf_criptografado = criptografar_cpf(cpf_limpo)
+    # Criptografa apenas os 4 primeiros dígitos
+    prefixo_criptografado = criptografar_cpf(cpf_limpo[:4])
 
-    # Verifica se existe
-    sql = "SELECT nome FROM eleitores WHERE cpf = %s"
-    cursor.execute(sql, (cpf_criptografado,))
-    eleitor = cursor.fetchone()
+    # Busca todos os eleitores
+    cursor.execute(
+        "SELECT id, nome, cpf FROM eleitores"
+    )
+    eleitores = cursor.fetchall()
 
-    if not eleitor:
-        print("Eleitor não encontrado.")
+    encontrados = []
+
+    # Filtra eleitores pelo prefixo do CPF criptografado
+    for e in eleitores:
+        id_eleitor, nome, cpf_criptografado = e
+
+        if cpf_criptografado.startswith(prefixo_criptografado):
+            encontrados.append(e)
+
+    if not encontrados:
+        print("Nenhum eleitor encontrado com esse CPF.")
         return
 
-    print(f"Eleitor encontrado: {eleitor[0]}")
+    if len(encontrados) > 1:
+        print("\nMais de um eleitor encontrado. Remoção cancelada.")
+        print("Eleitores encontrados:")
+
+        for e in encontrados:
+            print(f"- {e[1]}")
+
+        print("Use o CPF completo para remover.")
+        return
+
+    # Apenas um eleitor encontrado
+    id_eleitor, nome, cpf_criptografado = encontrados[0]
+
+    print(f"\nEleitor encontrado: {nome}")
     confirm = input("Confirmar remoção? (s/n): ").strip().lower()
 
     if confirm != "s":
         print("Remoção cancelada.")
         return
 
-    # Remove do banco
-    sql = "DELETE FROM eleitores WHERE cpf = %s"
-    cursor.execute(sql, (cpf_criptografado,))
+    # Remove o eleitor
+    cursor.execute(
+        "DELETE FROM eleitores WHERE id = %s",
+        (id_eleitor,)
+    )
     conexao.commit()
 
     print("Eleitor removido com sucesso.")
