@@ -1,0 +1,6 @@
+[2026-05-24 15:35:44] LOGIN_MESARIO_FALHA: Tentativa de abertura de urna com título inexistente
+[2026-05-24 15:40:27] LOGIN_MESARIO: Mesário autenticado com sucesso
+[2026-05-24 15:40:27] ABERTURA_URNA: Urna aberta pelo mesário
+[2026-05-24 15:40:27] ZERESIMA: Zerésima emitida com sucesso
+[2026-05-24 15:41:34] VOTO_REGISTRADO: Voto computado com sucesso
+[2026-05-24 15:41:34] STATUS_VOTO_ATUALIZADO: Eleitor teve status de voto atualizado

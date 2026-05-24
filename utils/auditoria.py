@@ -1,47 +1,56 @@
+import os
 from datetime import datetime
 
-ARQUIVO_AUDITORIA = "./logs/log.txt"
+# Caminho do arquivo de log relativo à raiz do projeto
+ARQUIVO_AUDITORIA = os.path.join(os.path.dirname(__file__), '..', 'logs', 'log.txt')
+
 
 def registrar_evento(acao, descricao):
     """
-    Registra um evento de auditoria em arquivo texto.
+    Registra um evento crítico no arquivo de log (.txt).
 
-    Parâmetros:
-    acao (str)       -> Tipo do evento (ex: ABERTURA_URNA)
-    descricao (str)  -> Descrição do evento
+    O formato do registro segue o padrão exigido pelo RF002.02.01.02:
+    [YYYY-MM-DD HH:MM:SS] ACAO: descricao
+
+    Args:
+        acao (str): Categoria do evento (ex: 'ABERTURA', 'ALERTA', 'SUCESSO', 'ENCERRAMENTO').
+        descricao (str): Descrição detalhada do evento ocorrido.
+
+    Returns:
+        None
     """
-    
+    # Obtém data e hora atual no formato exigido pelo requisito
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Obtém data e hora atual
-    data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    # Monta a linha de log no padrão [YYYY-MM-DD HH:MM:SS] ACAO: descricao
+    linha = f"[{timestamp}] {acao}: {descricao}\n"
 
-    # Abre o arquivo em modo de escrita com acréscimo (append)
-    arquivo = open(ARQUIVO_AUDITORIA, "a", encoding="utf-8")
-
-    # Escreve uma linha no arquivo
-    arquivo.write(data_hora + " | " + acao + " | " + descricao + "\n")
-
-    # Fecha o arquivo
-    arquivo.close()
+    # Abre o arquivo em modo append para não sobrescrever registros anteriores
+    with open(ARQUIVO_AUDITORIA, "a", encoding="utf-8") as arquivo:
+        arquivo.write(linha)
 
 
 def visualizar_auditoria():
     """
-    Exibe todos os registros de auditoria salvos no arquivo.
+    Lê e exibe o conteúdo completo do arquivo de log no terminal.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None
     """
+    print("\n=== LOGS DE OCORRÊNCIAS ===")
 
-    print("\n=== AUDITORIA DO SISTEMA ===")
-
-    try:
-        arquivo = open(ARQUIVO_AUDITORIA, "r", encoding="utf-8")
-    except FileNotFoundError:
+    # Verifica se o arquivo existe antes de tentar abrir
+    if not os.path.exists(ARQUIVO_AUDITORIA):
         print("Nenhum registro de auditoria encontrado.")
         return
 
-    linhas = arquivo.readlines()
-    arquivo.close()
+    with open(ARQUIVO_AUDITORIA, "r", encoding="utf-8") as arquivo:
+        linhas = arquivo.readlines()
 
-    if len(linhas) == 0:
+    if not linhas:
         print("Nenhum registro de auditoria encontrado.")
         return
 

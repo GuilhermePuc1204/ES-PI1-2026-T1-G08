@@ -47,6 +47,9 @@ def criptografar_cpf(cpf):
         str: CPF criptografado em formato alfabético.
     """
 
+    # Remove pontos, traços e qualquer caractere não numérico antes de processar
+    cpf = ''.join(c for c in cpf if c.isdigit())
+
     # Converte cada dígito do CPF para inteiro
     cpf = [int(d) for d in cpf]
 

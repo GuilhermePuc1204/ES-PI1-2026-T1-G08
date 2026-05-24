@@ -1,32 +1,39 @@
 from votacao.votar import votar
-from utils.auditoria import registrar_evento
+from votacao.encerramento import encerrar_votacao
+
+
 def menu_urna():
+    """
+    Exibe o menu de operação da urna após a abertura do sistema.
 
-    op = -1
+    Disponibilizado somente após a conclusão da Zerésima (RF002.01.06).
+    Oferece as opções de registrar um voto ou encerrar a votação.
 
-    while op != "0":
+    Args:
+        Nenhum.
+
+    Returns:
+        None
+    """
+    op = ""
+
+    while True:
         print("\n=== URNA ELETRÔNICA ===")
         print("1 - Votar")
         print("2 - Encerrar Votação")
-        print("0 - Voltar")
 
-        op = input("Escolha: ")
+        op = input("Escolha: ").strip()
 
         if op == "1":
+            # Inicia o fluxo de identificação e votação do eleitor
             votar()
 
         elif op == "2":
-            # EVENTO AUDITÁVEL: ENCERRAMENTO DA URNA
-            registrar_evento(
-                "ENCERRAMENTO_URNA",
-                "Urna encerrada"
-            )
-
-            print("Votação encerrada (teste).")
-            break
-
-        elif op == "0":
-            print("Voltando...")
+            # Inicia o fluxo de encerramento com autenticação do mesário
+            encerrado = encerrar_votacao()
+            if encerrado:
+                # Só sai do loop se o encerramento foi confirmado e bem-sucedido
+                break
 
         else:
             print("Opção inválida.")
