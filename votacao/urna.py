@@ -17,7 +17,7 @@ def menu_urna():
     """
     op = ""
 
-    while True:
+    while op != "2":
         print("\n=== URNA ELETRÔNICA ===")
         print("1 - Votar")
         print("2 - Encerrar Votação")
@@ -29,11 +29,11 @@ def menu_urna():
             votar()
 
         elif op == "2":
-            # Inicia o fluxo de encerramento com autenticação do mesário
-            encerrado = encerrar_votacao()
-            if encerrado:
-                # Só sai do loop se o encerramento foi confirmado e bem-sucedido
-                break
+            # Só sai do loop se o encerramento for confirmado com sucesso
+            # Se o mesário cancelar, reseta op para continuar o loop
+            if not encerrar_votacao():
+                op = ""
 
         else:
             print("Opção inválida.")
+            op = ""
