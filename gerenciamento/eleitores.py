@@ -85,9 +85,12 @@ def listar_eleitores():
         return
 
     for e in dados:
+        cpf_original = descriptografar_cpf(e[1])
+        cpf_formatado = ( f"{cpf_original[0:3]}."f"{cpf_original[3:6]}."f"{cpf_original[6:9]}-"f"{cpf_original[9:11]}")
+
         print("\n------------------")
         print("Nome:", e[0])
-        print("CPF (criptografado):", e[1])
+        print("CPF: ", cpf_formatado)
         print("Título:", e[2])
         print("Mesário:", "Sim" if e[3] else "Não")
         print("Status:", e[4])

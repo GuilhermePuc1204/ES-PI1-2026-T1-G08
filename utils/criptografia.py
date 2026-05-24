@@ -1,17 +1,10 @@
-# ==========================================================
-# DEFINIÇÃO DOS ALFABETOS E MATRIZ-CHAVE
-# ==========================================================
-
 # Alfabeto utilizado para criptografia do CPF
-# Contém apenas letras, pois o CPF é composto exclusivamente por números
 alfabeto = [
     "A","B","C","D","E","F","G","H","I","J","K","L","M",
     "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
 ]
 
 # Matriz-chave da Cifra de Hill (2x2)
-# Esta matriz é fixa e conhecida pelo sistema
-# Seu uso permite a transformação linear dos dados
 chave_hill = [
     [3, 3],
     [2, 5]
@@ -25,31 +18,7 @@ alfabeto_chave = [
     "0","1","2","3","4","5","6","7","8","9"
 ]
 
-
-# ==========================================================
-# CRIPTOGRAFIA DO CPF
-# ==========================================================
 def criptografar_cpf(cpf):
-    """
-    Criptografa o CPF do eleitor utilizando a Cifra de Hill (matriz 2x2).
-
-    Processo aplicado:
-    1. Conversão dos dígitos do CPF para inteiros
-    2. Agrupamento dos dados em pares
-    3. Multiplicação pela matriz-chave
-    4. Aplicação de módulo para limitar o domínio
-    5. Conversão do resultado para letras
-
-    Args:
-        cpf (str): CPF válido contendo apenas números.
-
-    Returns:
-        str: CPF criptografado em formato alfabético.
-    """
-
-    # Remove pontos, traços e qualquer caractere não numérico antes de processar
-    cpf = ''.join(c for c in cpf if c.isdigit())
-
     # Converte cada dígito do CPF para inteiro
     cpf = [int(d) for d in cpf]
 
