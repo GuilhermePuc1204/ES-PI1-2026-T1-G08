@@ -1,4 +1,5 @@
 from datetime import datetime
+from database.conexao import cursor
 
 ARQUIVO_AUDITORIA = "./logs/log.txt"
 
@@ -40,3 +41,24 @@ def visualizar_auditoria():
 
     for linha in linhas:
         print(linha.strip())
+
+
+def listar_protocolos():
+    print("\n=== PROTOCOLOS DE VOTAÇÃO ===")
+
+    cursor.execute(
+        "SELECT protocolo, data_hora FROM votos ORDER BY protocolo"
+    )
+    protocolos = cursor.fetchall()
+
+    if not protocolos:
+        print("Nenhum protocolo registrado.")
+        return
+
+    for p in protocolos:
+        print(f"{p[0]} - {p[1]}")
+
+    registrar_evento(
+        "PROTOCOLOS_EXIBIDOS",
+        "Protocolos de votação exibidos"
+    )

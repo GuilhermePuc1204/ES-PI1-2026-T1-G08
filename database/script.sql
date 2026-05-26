@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS candidatos (
 
 CREATE TABLE IF NOT EXISTS votos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_candidato INT NOT NULL,
+    id_candidato INT NULL,
     data_hora TIMESTAMP NOT NULL,
     protocolo VARCHAR(100) NOT NULL,
     FOREIGN KEY (id_candidato) REFERENCES candidatos(id)

@@ -113,3 +113,4 @@ def encerrar_votacao():
     )
     agora = datetime.now()
     print(f"\nVotação encerrada em {agora.strftime('%d/%m/%Y %H:%M:%S')}.")
+    return True

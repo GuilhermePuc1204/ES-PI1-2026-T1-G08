@@ -165,13 +165,13 @@ def menu_resultados():
             boletim_urna()
 
         elif op == "2":
-            print(estatisticas_comparecimento())
+            estatisticas_comparecimento()
 
         elif op == "3":
-            print(votos_por_partido())
+            votos_por_partido()
 
         elif op == "4":
-            print(validacao_integridade())
+            validacao_integridade()
 
         elif op == "0":
             print("Voltando...")

@@ -37,11 +37,12 @@ def cadastrar_eleitor():
     mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
     #criptografia do cpf
-    cpf_criptografado = criptografar_cpf(cpf) 
+    cpf_limpo = re.sub(r"\D", "", cpf)
+    cpf_criptografado = criptografar_cpf(cpf_limpo)
 
-    # verifica duplicidade
-    sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s" 
-    cursor.execute(sql, (cpf, titulo))  
+    # verifica duplicidade (compara CPF criptografado contra o que está no banco)
+    sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"
+    cursor.execute(sql, (cpf_criptografado, titulo))
 
     if cursor.fetchone(): 
         print("CPF ou título já cadastrado.")  # informa duplicidade
@@ -58,7 +59,8 @@ def cadastrar_eleitor():
     chave_criptografada = criptografar_chave_acesso(chave)
 
 
-    sql = """  # comando SQL para inserir um novo eleitor
+    # comando SQL para inserir um novo eleitor
+    sql = """
     INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
     VALUES (%s, %s, %s, %s, %s)
     """
@@ -231,3 +233,110 @@ def remover_eleitor():
     conexao.commit()
 
     print("Eleitor removido com sucesso.")
+
+
+def editar_eleitor():
+    print("\n=== EDITAR ELEITOR ===")
+
+    cpf = input("Digite o CPF do eleitor: ").strip()
+    cpf_limpo = re.sub(r"\D", "", cpf)
+
+    if len(cpf_limpo) < 4:
+        print("Digite pelo menos 4 números do CPF.")
+        return
+
+    prefixo_criptografado = criptografar_cpf(cpf_limpo[:4])
+
+    cursor.execute(
+        "SELECT id, nome, cpf, titulo_eleitor, mesario FROM eleitores"
+    )
+    eleitores = cursor.fetchall()
+
+    encontrados = []
+    for e in eleitores:
+        if e[2].startswith(prefixo_criptografado):
+            encontrados.append(e)
+
+    if not encontrados:
+        print("Eleitor não encontrado.")
+        return
+
+    if len(encontrados) > 1:
+        print("\nMais de um eleitor encontrado. Edição cancelada.")
+        for e in encontrados:
+            print(f"- {e[1]}")
+        print("Use o CPF completo para editar.")
+        return
+
+    id_eleitor, nome_atual, cpf_atual_crypt, titulo_atual, mesario_atual = encontrados[0]
+
+    print(f"\nEleitor encontrado: {nome_atual}")
+    print("(Pressione ENTER para manter o valor atual)")
+
+    # Novo nome
+    novo_nome = input(f"Nome atual ({nome_atual}). Novo nome: ").strip()
+    if not novo_nome:
+        novo_nome = nome_atual
+
+    # Novo CPF
+    novo_cpf_input = input("Novo CPF: ").strip()
+    if novo_cpf_input:
+        if not validar_cpf(novo_cpf_input):
+            print("CPF inválido. Edição cancelada.")
+            return
+        novo_cpf_limpo = re.sub(r"\D", "", novo_cpf_input)
+        novo_cpf_crypt = criptografar_cpf(novo_cpf_limpo)
+
+        cursor.execute(
+            "SELECT id FROM eleitores WHERE cpf = %s AND id != %s",
+            (novo_cpf_crypt, id_eleitor)
+        )
+        if cursor.fetchone():
+            print("CPF já cadastrado para outro eleitor. Edição cancelada.")
+            return
+    else:
+        novo_cpf_crypt = cpf_atual_crypt
+
+    # Novo título
+    novo_titulo = input(f"Título atual ({titulo_atual}). Novo título: ").strip()
+    if novo_titulo:
+        if not validar_titulo_eleitor(novo_titulo):
+            print("Título de eleitor inválido. Edição cancelada.")
+            return
+
+        cursor.execute(
+            "SELECT id FROM eleitores WHERE titulo_eleitor = %s AND id != %s",
+            (novo_titulo, id_eleitor)
+        )
+        if cursor.fetchone():
+            print("Título já cadastrado para outro eleitor. Edição cancelada.")
+            return
+    else:
+        novo_titulo = titulo_atual
+
+    # Mesário
+    mesario_str = "s" if mesario_atual else "n"
+    resp_mesario = input(f"É mesário? (s/n) [atual: {mesario_str}]: ").strip().lower()
+    if resp_mesario == "s":
+        novo_mesario = True
+    elif resp_mesario == "n":
+        novo_mesario = False
+    else:
+        novo_mesario = mesario_atual
+
+    cursor.execute(
+        """
+        UPDATE eleitores
+           SET nome = %s, cpf = %s, titulo_eleitor = %s, mesario = %s
+         WHERE id = %s
+        """,
+        (novo_nome, novo_cpf_crypt, novo_titulo, novo_mesario, id_eleitor)
+    )
+    conexao.commit()
+
+    print("\nEleitor atualizado com sucesso!")
+
+    registrar_evento(
+        "EDICAO_ELEITOR",
+        "Eleitor editado com sucesso"
+    )

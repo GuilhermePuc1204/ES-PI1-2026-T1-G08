@@ -18,14 +18,10 @@ def menu_urna():
             votar()
 
         elif op == "2":
-            encerrar_votacao()
-            print("Votação encerrada (teste).")
-            break
-            # EVENTO AUDITÁVEL: ENCERRAMENTO DA URNA
-            registrar_evento(
-                "ENCERRAMENTO_URNA",
-                "Urna encerrada"
-            )    
+            if encerrar_votacao():
+                # encerramento confirmado: sai da urna e volta ao menu de votação
+                break
+
         elif op == "0":
             print("Voltando...")
 

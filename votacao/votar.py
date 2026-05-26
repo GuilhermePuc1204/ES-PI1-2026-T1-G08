@@ -17,8 +17,12 @@ def votar():
     print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
 
     titulo = input("Título de eleitor: ").strip()
-    cpf_input = input("CPF (somente números): ").strip()
+    cpf_input = input("4 primeiros dígitos do CPF: ").strip()
     chave = input("Chave de acesso: ").strip()
+
+    if len(cpf_input) != 4 or not cpf_input.isdigit():
+        print("Entrada inválida. Digite exatamente os 4 primeiros dígitos do CPF.")
+        return
 
     # busca eleitor
     cursor.execute(
@@ -34,7 +38,7 @@ def votar():
     id_eleitor, cpf_criptografado, chave_armazenada, status = eleitor
 
     # valida CPF (comparando primeiros dígitos criptografados)
-    if criptografar_cpf(cpf_input[:4]) != cpf_criptografado[:4]:
+    if criptografar_cpf(cpf_input) != cpf_criptografado[:4]:
         print("CPF inválido.")
         return
 
@@ -46,28 +50,33 @@ def votar():
     # verifica se já votou
     if status == "JA_VOTOU":
         print("Eleitor já votou.")
+        registrar_evento(
+            "ALERTA",
+            "Tentativa de voto duplo"
+        )
         return
 
-    # votação
-    numero = input("\nDigite o número do candidato: ").strip()
+    # votação — repete enquanto o eleitor não confirmar
+    confirm = ""
+    candidato = None
+    numero = ""
+    while confirm.lower() != "s":
+        numero = input("\nDigite o número do candidato: ").strip()
 
-    cursor.execute(
-        "SELECT id, nome, partido FROM candidatos WHERE numero = %s",
-        (numero,)
-    )
-    candidato = cursor.fetchone()
+        cursor.execute(
+            "SELECT id, nome, partido FROM candidatos WHERE numero = %s",
+            (numero,)
+        )
+        candidato = cursor.fetchone()
 
-    if candidato:
-        print(f"\nNome: {candidato[1]}")
-        print(f"Partido: {candidato[2]}")
-    else:
-        print("\nVOTO NULO")
+        if candidato:
+            print(f"\nNome: {candidato[1]}")
+            print(f"Partido: {candidato[2]}")
+        else:
+            print("\nVOTO NULO")
 
-    confirm = input("Confirmar voto? (s/n): ")
-
-    if confirm.lower() != "s":
-        print("Voto cancelado.")
-        return
+        confirm = input("Confirmar voto? (s/n): ")
+        # se não confirmar, volta ao campo de inserção do número
 
     protocolo = gerar_protocolo(numero)
 
