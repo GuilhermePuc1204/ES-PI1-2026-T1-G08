@@ -1,24 +1,24 @@
-import random  # importa o módulo random para gerar valores aleatórios
-import re  # importa o módulo re para expressões regulares
-from database.conexao import conexao, cursor  # importa a conexão e o cursor do banco para executar comandos SQL
-from utils.validacoes import validar_cpf, validar_titulo_eleitor  # importa as funções de validação de CPF e título de eleitor
+import random  
+import re  
+from database.conexao import conexao, cursor  
+from utils.validacoes import validar_cpf, validar_titulo_eleitor  
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso 
 from utils.descriptografia import descriptografar_cpf
 from utils.auditoria import registrar_evento
 
-def gerar_chave(nome):  # função que gera uma chave de acesso com base no nome
-    partes = nome.upper().split()  # transforma o nome em maiúsculo e separa em partes (por espaços)
+def gerar_chave(nome): 
+    partes = nome.upper().split()  
 
     if len(partes) < 2:  # verifica se o nome tem pelo menos 2 partes (ex: nome e sobrenome)
-        return None  # retorna None indicando que não é possível gerar a chave
+        return None  
 
     return partes[0][:2] + partes[1][0] + str(random.randint(1000, 9999))  # monta a chave: 2 letras do 1º nome + 1 letra do 2º + número aleatório
 
 
-def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
-    print("\n=== CADASTRO DE ELEITOR ===")  # mostra o título da tela de cadastro
+def cadastrar_eleitor():  
+    print("\n=== CADASTRO DE ELEITOR ===")  
 
-    nome = input("Nome completo: ")  # lê o nome completo do eleitor
+    nome = input("Nome completo: ")  # lê o nome do eleitor
 
     cpf = input("CPF: ")  # lê o CPF do eleitor
     if not validar_cpf(cpf):
@@ -37,24 +37,24 @@ def cadastrar_eleitor():  # função para cadastrar um eleitor no sistema
     mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
     #criptografia do cpf
-    cpf_criptografado = criptografar_cpf(cpf) # Chama a função de criptografia do CPF e armazena o resultado.
+    cpf_criptografado = criptografar_cpf(cpf) 
 
     # verifica duplicidade
-    sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"  # comando SQL para verificar se CPF ou título já existem
-    cursor.execute(sql, (cpf, titulo))  # executa o SELECT passando cpf e título como parâmetros
+    sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s" 
+    cursor.execute(sql, (cpf, titulo))  
 
-    if cursor.fetchone():  # se encontrou algum registro com o CPF ou título informado
+    if cursor.fetchone(): 
         print("CPF ou título já cadastrado.")  # informa duplicidade
         return  # sai da função sem cadastrar
 
-    chave = gerar_chave(nome)  # gera a chave de acesso a partir do nome
+    chave = gerar_chave(nome)  
 
-    if not chave:  # se a chave não foi gerada (ex: nome inválido)
-        print("Nome inválido.")  # informa que o nome não permitiu gerar chave
-        return  # sai da função
+    if not chave:  
+        print("Nome inválido.") 
+        return  
     
     
-    # Criptografia da chave de acesso (RNF006)
+    
     chave_criptografada = criptografar_chave_acesso(chave)
 
 

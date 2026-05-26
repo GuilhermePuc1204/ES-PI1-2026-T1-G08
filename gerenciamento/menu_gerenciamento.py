@@ -1,10 +1,5 @@
-from gerenciamento.candidatos import (cadastrar_candidato, listar_candidatos, remover_candidato)
-from gerenciamento.eleitores import (
-    cadastrar_eleitor,
-    listar_eleitores,
-    buscar_eleitor,
-    remover_eleitor
-)
+from gerenciamento.candidatos import (cadastrar_candidato, listar_candidatos, remover_candidato, buscar_candidato)
+from gerenciamento.eleitores import (cadastrar_eleitor, listar_eleitores, buscar_eleitor, remover_eleitor)
 
 def menu_gerenciamento():
 
@@ -19,6 +14,7 @@ def menu_gerenciamento():
         print("5 - Cadastrar candidato")
         print("6 - Listar candidatos")
         print("7 - Remover Candidato")
+        print("8 - Buscar Candidato")
         print("0 - Voltar")
 
         op = input("Escolha: ")
@@ -43,6 +39,9 @@ def menu_gerenciamento():
 
         elif op == "7":
             remover_candidato()
+
+        elif op == "8":
+            buscar_candidato()
 
         elif op == "0":
             print("Voltando...")

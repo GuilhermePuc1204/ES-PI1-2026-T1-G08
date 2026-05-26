@@ -69,3 +69,23 @@ def remover_candidato():
         print("Candidato removido com sucesso!")
     else:
         print("Remoção cancelada.")
+
+
+def buscar_candidato():
+
+    print("\n=== BUSCAR CANDIDATO ===")
+
+    numero = input("Digite o número do candidato: ")
+
+    sql = "SELECT nome, numero, partido FROM candidatos WHERE numero = %s"
+    cursor.execute(sql, (numero,))
+    candidato = cursor.fetchone()
+
+    if not candidato:
+        print("Candidato não encontrado.")
+        return
+
+    print("\n=== DADOS DO CANDIDATO ===")
+    print(f"Nome: {candidato[0]}")
+    print(f"Número: {candidato[1]}")
+    print(f"Partido: {candidato[2]}")
