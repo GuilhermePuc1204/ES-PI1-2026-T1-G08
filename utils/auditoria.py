@@ -1,9 +1,15 @@
 from datetime import datetime
+import os
 from database.conexao import cursor
 
-ARQUIVO_AUDITORIA = "./logs/log.txt"
+PASTA_AUDITORIA = "./logs"
+NOME_ARQUIVO_AUDITORIA = datetime.now().strftime("auditoria_%Y%m%d_%H%M%S_%f.txt")
+ARQUIVO_AUDITORIA = os.path.join(PASTA_AUDITORIA, NOME_ARQUIVO_AUDITORIA)
 
 def registrar_evento(acao, descricao):
+    if not os.path.exists(PASTA_AUDITORIA):
+        os.mkdir(PASTA_AUDITORIA)
+
     # Obtém data e hora atual
     data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
@@ -15,7 +21,6 @@ def registrar_evento(acao, descricao):
 
     # Fecha o arquivo
     arquivo.close()
-
 
 def visualizar_auditoria():
     
