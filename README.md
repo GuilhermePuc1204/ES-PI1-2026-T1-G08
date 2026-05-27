@@ -181,8 +181,6 @@ CPF do eleitor
 
 Chave de acesso 
 
-Protocolo de votação 
-
 Veja utils/criptografia.py para detalhes técnicos. 
 
  
