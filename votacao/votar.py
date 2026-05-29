@@ -1,16 +1,25 @@
 from database.conexao import conexao, cursor
 from datetime import datetime
 import random
-import string
-from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
+from utils.criptografia import criptografar_cpf, criptografar_chave_acesso, criptografar_protocolo
 from utils.auditoria import registrar_evento
 
 
 def gerar_protocolo(numero):
-    letras = ''.join(random.choices(string.ascii_uppercase, k=2))
-    numeros = ''.join(random.choices(string.digits, k=5))
-    return f"V{letras}26{numero}{numeros}"
+    letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    numeros = "0123456789"
 
+    parte_letras = ""
+    for i in range(2):
+        i = random.randint(0, len(letras) - 1)
+        parte_letras += letras[i]
+
+    parte_numeros = ""
+    for i in range(5):
+        i = random.randint(0, len(numeros) - 1)
+        parte_numeros += numeros[i]
+
+    return "V" + parte_letras + "26" + numero + parte_numeros
 
 def votar():
 
@@ -79,12 +88,12 @@ def votar():
         # se não confirmar, volta ao campo de inserção do número
 
     protocolo = gerar_protocolo(numero)
-
+    protocolo_criptografado = criptografar_protocolo(protocolo)
     id_candidato = candidato[0] if candidato else None
 
     cursor.execute(
         "INSERT INTO votos (id_candidato, data_hora, protocolo) VALUES (%s, %s, %s)",
-        (id_candidato, datetime.now(), protocolo)
+        (id_candidato, datetime.now(), protocolo_criptografado)
     )
 
     cursor.execute(
@@ -94,19 +103,12 @@ def votar():
 
     conexao.commit()
 
-    # EVENTO AUDITÁVEL: VOTO REGISTRADO
     registrar_evento(
-        "VOTO_REGISTRADO",
-        "Voto computado com sucesso"
+        "SUCESSO",
+        "Voto realizado com sucesso"
     )
 
     
-    # EVENTO AUDITÁVEL: STATUS DE VOTO ATUALIZADO
-    registrar_evento(
-        "STATUS_VOTO_ATUALIZADO",
-        "Eleitor teve status de voto atualizado"
-    )
-
 
     print("\nVoto registrado com sucesso!")
     print(f"Protocolo: {protocolo}")

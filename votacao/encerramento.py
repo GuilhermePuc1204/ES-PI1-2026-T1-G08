@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from database.conexao import conexao, cursor
+from database.conexao import cursor
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
 from utils.auditoria import registrar_evento
 
@@ -101,14 +101,11 @@ def encerrar_votacao():
 
     if criptografar_chave_acesso(chave_dupla) != chave_armazenada:
         print("Chave incorreta. Encerramento cancelado.")
-        registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Falha na dupla confirmação de encerramento"
-        )
+
         return False
 
     registrar_evento(
-        "ENCERRAMENTO_URNA",
+        "ENCERRAMENTO",
         "Votação finalizada com sucesso"
     )
     agora = datetime.now()

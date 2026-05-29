@@ -82,6 +82,7 @@ def votos_por_partido():
 
     print("\n=== VOTOS POR PARTIDO ===")
 
+    # Votos por partido (exclui votos nulos automaticamente)
     sql = """
     SELECT c.partido, COUNT(v.id) as total
     FROM candidatos c
@@ -100,6 +101,9 @@ def votos_por_partido():
     cursor.execute("SELECT COUNT(*) FROM votos")
     total_votos = cursor.fetchone()[0]
 
+    cursor.execute("SELECT COUNT(*) FROM votos WHERE id_candidato IS NULL")
+    votos_nulos = cursor.fetchone()[0]
+
     maior = 0
     vencedor = None
 
@@ -117,6 +121,12 @@ def votos_por_partido():
             maior = total
             vencedor = r
 
+    if votos_nulos > 0:
+        percentual_nulo = (votos_nulos / total_votos) * 100 if total_votos > 0 else 0
+        print(f"\nVOTOS NULOS: {votos_nulos} voto{'s' if votos_nulos != 1 else ''} ({percentual_nulo:.1f}%)")
+    else:
+        print("\nVOTOS NULOS: 0")
+
     if vencedor:
         print("\n=== PARTIDO MAIS VOTADO ===")
         print(f"Partido: {vencedor[0]}")
@@ -130,7 +140,7 @@ def validacao_integridade():
     cursor.execute("SELECT COUNT(*) FROM votos")
     total_votos = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM eleitores WHERE status_voto != 'Não votou'")
+    cursor.execute("SELECT COUNT(*) FROM eleitores WHERE status_voto = 'JA_VOTOU'")
     total_votantes = cursor.fetchone()[0]
 
     cursor.execute("SELECT COUNT(*) FROM eleitores")

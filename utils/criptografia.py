@@ -1,17 +1,18 @@
-# Alfabeto utilizado para criptografia do CPF
 alfabeto = [
     "A","B","C","D","E","F","G","H","I","J","K","L","M",
     "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
 ]
 
-# Matriz-chave da Cifra de Hill (2x2)
 chave_hill = [
     [3, 3],
     [2, 5]
 ]
 
-# Alfabeto utilizado para criptografia da chave de acesso
-# Inclui letras e números, pois a chave de acesso possui ambos
+chave_hill_chave = [
+    [1, 2],
+    [3, 5]
+]
+
 alfabeto_chave = [
     "A","B","C","D","E","F","G","H","I","J","K","L","M",
     "N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
@@ -19,31 +20,25 @@ alfabeto_chave = [
 ]
 
 def criptografar_cpf(cpf):
-    # Converte cada dígito do CPF para inteiro
     cpf = [int(d) for d in cpf]
 
-    # Garante que a quantidade de elementos seja par
-    # A Cifra de Hill trabalha com blocos compatíveis com a matriz (2x2)
+
     if len(cpf) % 2 != 0:
         cpf.append(0)
 
     resultado = []
 
-    # Processa o CPF em blocos de 2 valores
     for i in range(0, len(cpf), 2):
         x = cpf[i]
         y = cpf[i + 1]
 
-        # Aplicação da Cifra de Hill:
-        # Multiplicação da matriz-chave pelo vetor [x, y]
         r1 = (chave_hill[0][0] * x + chave_hill[0][1] * y) % len(alfabeto)
         r2 = (chave_hill[1][0] * x + chave_hill[1][1] * y) % len(alfabeto)
 
-        # Conversão dos valores numéricos para letras
+
         resultado.append(alfabeto[r1])
         resultado.append(alfabeto[r2])
 
-    # Retorna o CPF criptografado como string
     return "".join(resultado)
 
 
@@ -65,7 +60,6 @@ def criptografar_chave_acesso(chave):
         str: Chave de acesso criptografada.
     """
 
-    # Converte cada caractere da chave em um índice do alfabeto
     valores = []
     for c in chave.upper():
         if c not in alfabeto_chave:
@@ -84,11 +78,14 @@ def criptografar_chave_acesso(chave):
         y = valores[i + 1]
 
         # Aplicação da Cifra de Hill
-        r1 = (chave_hill[0][0] * x + chave_hill[0][1] * y) % len(alfabeto_chave)
-        r2 = (chave_hill[1][0] * x + chave_hill[1][1] * y) % len(alfabeto_chave)
+        r1 = (chave_hill_chave[0][0] * x + chave_hill_chave[0][1] * y) % len(alfabeto_chave)
+        r2 = (chave_hill_chave[1][0] * x + chave_hill_chave[1][1] * y) % len(alfabeto_chave)
 
         resultado.append(alfabeto_chave[r1])
         resultado.append(alfabeto_chave[r2])
 
     # Retorna a chave criptografada
     return "".join(resultado)
+
+def criptografar_protocolo(protocolo):
+    return criptografar_chave_acesso(protocolo)

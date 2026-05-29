@@ -17,17 +17,14 @@ def registrar_evento(acao, descricao):
     arquivo = open(ARQUIVO_AUDITORIA, "a", encoding="utf-8")
 
     # Escreve uma linha no arquivo
-    arquivo.write(data_hora + " | " + acao + " | " + descricao + "\n")
+    arquivo.write(f"[{data_hora}] {acao} | {descricao}\n")
 
     # Fecha o arquivo
     arquivo.close()
 
 def visualizar_auditoria():
     
-    registrar_evento(
-        "AUDITORIA_ACESSADA",
-        "Auditoria visualizada"
-    )
+
 
     print("\n=== AUDITORIA DO SISTEMA ===")
 
@@ -63,7 +60,3 @@ def listar_protocolos():
     for p in protocolos:
         print(f"{p[0]} - {p[1]}")
 
-    registrar_evento(
-        "PROTOCOLOS_EXIBIDOS",
-        "Protocolos de votação exibidos"
-    )

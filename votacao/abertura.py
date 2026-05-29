@@ -85,8 +85,8 @@ def abrir_votacao():
     if criptografar_chave_acesso(chave) != chave_armazenada:
         print("Chave incorreta.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Chave de acesso do mesário incorreta"
+            "ALERTA: ",
+            "Tentativa de acesso negado"
         )
         return
 
@@ -97,12 +97,9 @@ def abrir_votacao():
         "Mesário autenticado com sucesso"
     )
 
-    registrar_evento(
-        "ABERTURA_URNA",
-        "Urna aberta pelo mesário"
-    )
 
-    # --- ZERÉSIMA ---
+
+
     print("\n=== ZERÉSIMA ===")
 
     cursor.execute("DELETE FROM votos")
@@ -110,8 +107,8 @@ def abrir_votacao():
     conexao.commit()
 
     registrar_evento(
-        "ZERESIMA",
-        "Zerésima emitida com sucesso"
+        "ABERTURA",
+        "Votação iniciada com sucesso. Total de votos zerado."
     )
 
     cursor.execute("SELECT nome, numero, partido FROM candidatos ORDER BY nome")
