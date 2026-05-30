@@ -32,8 +32,8 @@ def encerrar_votacao():
     if len(titulo_limpo) < 4:
         print("Digite pelo menos 4 números do título.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Título do mesário inválido no encerramento"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
@@ -52,16 +52,16 @@ def encerrar_votacao():
     if not encontrados:
         print("Mesário não encontrado.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de encerramento com título inexistente"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
     if len(encontrados) > 1:
         print("Mais de um mesário encontrado. Use o título completo.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de encerramento com título ambíguo"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
@@ -70,8 +70,8 @@ def encerrar_votacao():
     if not mesario:
         print("Eleitor não é mesário.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de encerramento por eleitor não mesário"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
@@ -81,16 +81,16 @@ def encerrar_votacao():
     if len(primeiros_digitos) != 4 or not primeiros_digitos.isdigit():
         print("Entrada inválida.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "CPF parcial inválido no encerramento"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
     if criptografar_cpf(primeiros_digitos) != cpf_criptografado[:4]:
         print("Autenticação falhou.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "CPF parcial incorreto no encerramento"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
@@ -100,8 +100,8 @@ def encerrar_votacao():
     if criptografar_chave_acesso(chave) != chave_armazenada:
         print("Chave de acesso incorreta.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Chave incorreta no encerramento"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return False
 
@@ -123,7 +123,7 @@ def encerrar_votacao():
 
     registrar_evento(
         "ENCERRAMENTO",
-        "Votação finalizada com sucesso"
+        "Votação finalizada com sucesso."
     )
     agora = datetime.now()
     print(f"\nVotação encerrada em {agora.strftime('%d/%m/%Y %H:%M:%S')}.")

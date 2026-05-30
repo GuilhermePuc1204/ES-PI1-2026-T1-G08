@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS eleitores (
     titulo_eleitor VARCHAR(12) NOT NULL UNIQUE,
     mesario BOOLEAN NOT NULL,
     chave_acesso VARCHAR(50) NOT NULL,
-    status_voto VARCHAR(20) DEFAULT 'Não votou'
+    status_voto VARCHAR(20) DEFAULT 'NAO_VOTOU'
 );
 
 CREATE TABLE IF NOT EXISTS candidatos (

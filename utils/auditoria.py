@@ -15,7 +15,7 @@ def registrar_evento(acao, descricao):
     Cria a pasta de logs caso ainda não exista e adiciona uma nova linha
     ao arquivo de auditoria com o timestamp atual, o tipo da ação e a
     descrição do evento, no formato:
-    [YYYY/MM/DD HH:MM:SS] ACAO | descricao
+    [YYYY-MM-DD HH:MM:SS] ACAO: descricao
 
     Args:
         acao (str): Tipo da ocorrência (ex: "ABERTURA", "ALERTA",
@@ -30,13 +30,13 @@ def registrar_evento(acao, descricao):
         os.mkdir(PASTA_AUDITORIA)
 
     # Obtém data e hora atual
-    data_hora = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    data_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Abre o arquivo em modo de escrita com acréscimo (append)
     arquivo = open(ARQUIVO_AUDITORIA, "a", encoding="utf-8")
 
     # Escreve uma linha no arquivo
-    arquivo.write(f"[{data_hora}] {acao} | {descricao}\n")
+    arquivo.write(f"[{data_hora}] {acao}: {descricao}\n")
 
     # Fecha o arquivo
     arquivo.close()

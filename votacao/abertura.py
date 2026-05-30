@@ -35,8 +35,8 @@ def abrir_votacao():
     if len(titulo_limpo) < 4:
         print("Digite pelo menos 4 números do título.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Título do mesário informado com menos de 4 dígitos"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
@@ -56,16 +56,16 @@ def abrir_votacao():
     if not encontrados:
         print("Mesário não encontrado.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de abertura de urna com título inexistente"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
     if len(encontrados) > 1:
         print("Mais de um mesário encontrado. Use o título completo.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de abertura de urna com título ambíguo"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
@@ -75,8 +75,8 @@ def abrir_votacao():
     if not mesario:
         print("Eleitor não é mesário.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "Tentativa de abertura de urna por eleitor não mesário"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
@@ -85,16 +85,16 @@ def abrir_votacao():
     if len(primeiros_digitos) != 4 or not primeiros_digitos.isdigit():
         print("Entrada inválida.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "CPF parcial informado em formato inválido"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
     if criptografar_cpf(primeiros_digitos) != cpf_criptografado[:4]:
         print("Autenticação falhou.")
         registrar_evento(
-            "LOGIN_MESARIO_FALHA",
-            "CPF parcial do mesário incorreto"
+            "ALERTA",
+            "Tentativa de acesso negado"
         )
         return
 
@@ -103,7 +103,7 @@ def abrir_votacao():
     if criptografar_chave_acesso(chave) != chave_armazenada:
         print("Chave incorreta.")
         registrar_evento(
-            "ALERTA: ",
+            "ALERTA",
             "Tentativa de acesso negado"
         )
         return
