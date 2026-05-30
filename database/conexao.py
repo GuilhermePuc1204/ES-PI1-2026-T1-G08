@@ -16,8 +16,8 @@ def conectar_banco():
         conexao = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",
-            database="sistema_votacao"
+            password="Gui@1411",
+            database="sisteminha_votacao"
         )
 
         cursor = conexao.cursor()

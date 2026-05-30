@@ -4,7 +4,6 @@ from utils.auditoria import registrar_evento
 
 def boletim_urna():
 
-    # EVENTO AUDITÁVEL: INÍCIO DA APURAÇÃO
     registrar_evento(
         "APURACAO_INICIADA",
         "Apuração iniciada"
@@ -40,6 +39,13 @@ def boletim_urna():
             maior = total
             vencedor = r
 
+    cursor.execute(
+        "SELECT COUNT(*) FROM votos WHERE id_candidato IS NULL"
+    )
+    votos_nulos = cursor.fetchone()[0]
+
+    print(f"\nVOTOS NULOS: {votos_nulos} voto{'s' if votos_nulos != 1 else ''}")
+
     if vencedor:
         print("\n=== VENCEDOR ===")
         print(f"Nome: {vencedor[0]}")
@@ -47,12 +53,10 @@ def boletim_urna():
         print(f"Partido: {vencedor[2]}")
         print(f"Total: {maior} votos")
 
-    # EVENTO AUDITÁVEL: RESULTADOS EXIBIDOS
     registrar_evento(
         "RESULTADOS_EXIBIDOS",
         "Resultados exibidos"
     )
-
 def estatisticas_comparecimento():
 
     print("\n=== ESTATÍSTICAS DE COMPARECIMENTO ===")

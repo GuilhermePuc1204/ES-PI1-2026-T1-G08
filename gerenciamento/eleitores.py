@@ -1,5 +1,4 @@
 import random  
-import re  
 from database.conexao import conexao, cursor  
 from utils.validacoes import validar_cpf, validar_titulo_eleitor  
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso 
@@ -36,17 +35,20 @@ def cadastrar_eleitor():
 
     mesario = input("É mesário? (s/n): ").lower() == "s"  # lê se é mesário e converte para boolean (True se for "s")
 
-    #criptografia do cpf
-    cpf_limpo = re.sub(r"\D", "", cpf)
+    cpf_limpo = ""
+    
+    for c in cpf:
+        if c.isdigit():
+            cpf_limpo += c
+
     cpf_criptografado = criptografar_cpf(cpf_limpo)
 
-    # verifica duplicidade (compara CPF criptografado contra o que está no banco)
     sql = "SELECT * FROM eleitores WHERE cpf = %s OR titulo_eleitor = %s"
-    cursor.execute(sql, (cpf_criptografado, titulo))
+    cursor.execute(sql, (cpf_criptografado, titulo,))
 
     if cursor.fetchone(): 
-        print("CPF ou título já cadastrado.")  # informa duplicidade
-        return  # sai da função sem cadastrar
+        print("CPF ou título já cadastrado.")
+        return  
 
     chave = gerar_chave(nome)  
 
@@ -59,7 +61,6 @@ def cadastrar_eleitor():
     chave_criptografada = criptografar_chave_acesso(chave)
 
 
-    # comando SQL para inserir um novo eleitor
     sql = """
     INSERT INTO eleitores (nome, cpf, titulo_eleitor, mesario, chave_acesso)
     VALUES (%s, %s, %s, %s, %s)
@@ -109,7 +110,12 @@ def buscar_eleitor():
 
     valor = input("Digite CPF ou Título: ").strip()
 
-    somente_numeros = re.sub(r"\D", "", valor)
+    somente_numeros = ""
+
+    for c in valor:
+        if c.isdigit():
+            somente_numeros += c
+
 
     if len(somente_numeros) < 4:
         print("Digite pelo menos 4 números.")
@@ -125,7 +131,6 @@ def buscar_eleitor():
     for e in eleitores:
         cpf_criptografado = e[1]
 
-        # compara prefixo criptografado
         if cpf_criptografado.startswith(cpf_prefixo_criptografado):
             cpf_original = descriptografar_cpf(cpf_criptografado)
             cpf_formatado = (
@@ -177,16 +182,18 @@ def remover_eleitor():
     print("\n=== REMOVER ELEITOR ===")
 
     cpf = input("Digite o CPF: ").strip()
-    cpf_limpo = re.sub(r"\D", "", cpf)
+    cpf_limpo = ""
+    
+    for c in cpf:
+        if c.isdigit():
+            cpf_limpo += c
 
     if len(cpf_limpo) < 4:
         print("Digite pelo menos 4 números do CPF.")
         return
 
-    # Criptografa apenas os 4 primeiros dígitos
     prefixo_criptografado = criptografar_cpf(cpf_limpo[:4])
 
-    # Busca todos os eleitores
     cursor.execute(
         "SELECT id, nome, cpf FROM eleitores"
     )
@@ -194,7 +201,6 @@ def remover_eleitor():
 
     encontrados = []
 
-    # Filtra eleitores pelo prefixo do CPF criptografado
     for e in eleitores:
         id_eleitor, nome, cpf_criptografado = e
 
@@ -215,7 +221,6 @@ def remover_eleitor():
         print("Use o CPF completo para remover.")
         return
 
-    # Apenas um eleitor encontrado
     id_eleitor, nome, cpf_criptografado = encontrados[0]
 
     print(f"\nEleitor encontrado: {nome}")
@@ -225,7 +230,6 @@ def remover_eleitor():
         print("Remoção cancelada.")
         return
 
-    # Remove o eleitor
     cursor.execute(
         "DELETE FROM eleitores WHERE id = %s",
         (id_eleitor,)
@@ -239,7 +243,11 @@ def editar_eleitor():
     print("\n=== EDITAR ELEITOR ===")
 
     cpf = input("Digite o CPF do eleitor: ").strip()
-    cpf_limpo = re.sub(r"\D", "", cpf)
+    cpf_limpo = ""
+    
+    for c in cpf:
+        if c.isdigit():
+            cpf_limpo += c
 
     if len(cpf_limpo) < 4:
         print("Digite pelo menos 4 números do CPF.")
@@ -273,18 +281,20 @@ def editar_eleitor():
     print(f"\nEleitor encontrado: {nome_atual}")
     print("(Pressione ENTER para manter o valor atual)")
 
-    # Novo nome
     novo_nome = input(f"Nome atual ({nome_atual}). Novo nome: ").strip()
     if not novo_nome:
         novo_nome = nome_atual
 
-    # Novo CPF
     novo_cpf_input = input("Novo CPF: ").strip()
     if novo_cpf_input:
         if not validar_cpf(novo_cpf_input):
             print("CPF inválido. Edição cancelada.")
             return
-        novo_cpf_limpo = re.sub(r"\D", "", novo_cpf_input)
+        novo_cpf_limpo = ""
+
+        for c in novo_cpf_input:
+            if c.isdigit():
+                novo_cpf_limpo += c        
         novo_cpf_crypt = criptografar_cpf(novo_cpf_limpo)
 
         cursor.execute(
@@ -297,7 +307,6 @@ def editar_eleitor():
     else:
         novo_cpf_crypt = cpf_atual_crypt
 
-    # Novo título
     novo_titulo = input(f"Título atual ({titulo_atual}). Novo título: ").strip()
     if novo_titulo:
         if not validar_titulo_eleitor(novo_titulo):
@@ -314,7 +323,6 @@ def editar_eleitor():
     else:
         novo_titulo = titulo_atual
 
-    # Mesário
     mesario_str = "s" if mesario_atual else "n"
     resp_mesario = input(f"É mesário? (s/n) [atual: {mesario_str}]: ").strip().lower()
     if resp_mesario == "s":

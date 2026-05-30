@@ -33,7 +33,6 @@ def votar():
         print("Entrada inválida. Digite exatamente os 4 primeiros dígitos do CPF.")
         return
 
-    # busca eleitor
     cursor.execute(
         "SELECT id, cpf, chave_acesso, status_voto FROM eleitores WHERE titulo_eleitor = %s",
         (titulo,)
@@ -46,17 +45,14 @@ def votar():
 
     id_eleitor, cpf_criptografado, chave_armazenada, status = eleitor
 
-    # valida CPF (comparando primeiros dígitos criptografados)
     if criptografar_cpf(cpf_input) != cpf_criptografado[:4]:
         print("CPF inválido.")
         return
 
-    # valida chave
     if criptografar_chave_acesso(chave) != chave_armazenada:
         print("Chave incorreta.")
         return
 
-    # verifica se já votou
     if status == "JA_VOTOU":
         print("Eleitor já votou.")
         registrar_evento(
@@ -65,7 +61,6 @@ def votar():
         )
         return
 
-    # votação — repete enquanto o eleitor não confirmar
     confirm = ""
     candidato = None
     numero = ""
@@ -80,12 +75,12 @@ def votar():
 
         if candidato:
             print(f"\nNome: {candidato[1]}")
+            print(f"Número: {numero}")
             print(f"Partido: {candidato[2]}")
         else:
             print("\nVOTO NULO")
 
         confirm = input("Confirmar voto? (s/n): ")
-        # se não confirmar, volta ao campo de inserção do número
 
     protocolo = gerar_protocolo(numero)
     protocolo_criptografado = criptografar_protocolo(protocolo)

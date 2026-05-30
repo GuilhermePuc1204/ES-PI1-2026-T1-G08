@@ -1,10 +1,14 @@
-from utils.criptografia import alfabeto 
+from utils.criptografia import alfabeto, alfabeto_chave
 
 
-# Matriz inversa da chave de Hill (mod 26)
 chave_hill_inversa = [
     [15, 17],
     [20, 9]
+]
+
+chave_hill_chave_inversa = [
+    [31, 2],
+    [3, 35]
 ]
 
 def descriptografar_cpf(cpf_cifrado):
@@ -18,7 +22,6 @@ def descriptografar_cpf(cpf_cifrado):
         str: CPF original (apenas números).
     """
 
-    # Converte letras para índices
     valores = [alfabeto.index(c) for c in cpf_cifrado]
 
     resultado = []
@@ -32,5 +35,29 @@ def descriptografar_cpf(cpf_cifrado):
 
         resultado.append(str(p1))
         resultado.append(str(p2))
+
+    return "".join(resultado)
+
+
+def descriptografar_protocolo(texto_cifrado):
+    valores = []
+
+    for c in texto_cifrado:
+        valores.append(alfabeto_chave.index(c))
+
+    resultado = []
+
+    for i in range(0, len(valores), 2):
+        x = valores[i]
+        y = valores[i + 1]
+
+        p1 = (chave_hill_chave_inversa[0][0] * x +
+              chave_hill_chave_inversa[0][1] * y) % len(alfabeto_chave)
+
+        p2 = (chave_hill_chave_inversa[1][0] * x +
+              chave_hill_chave_inversa[1][1] * y) % len(alfabeto_chave)
+
+        resultado.append(alfabeto_chave[p1])
+        resultado.append(alfabeto_chave[p2])
 
     return "".join(resultado)

@@ -1,6 +1,8 @@
-from datetime import datetime
 import os
+from datetime import datetime
 from database.conexao import cursor
+from utils.descriptografia import descriptografar_protocolo
+
 
 PASTA_AUDITORIA = "./logs"
 NOME_ARQUIVO_AUDITORIA = datetime.now().strftime("auditoria_%Y%m%d_%H%M%S_%f.txt")
@@ -11,7 +13,7 @@ def registrar_evento(acao, descricao):
         os.mkdir(PASTA_AUDITORIA)
 
     # Obtém data e hora atual
-    data_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    data_hora = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
     # Abre o arquivo em modo de escrita com acréscimo (append)
     arquivo = open(ARQUIVO_AUDITORIA, "a", encoding="utf-8")
@@ -58,5 +60,9 @@ def listar_protocolos():
         return
 
     for p in protocolos:
-        print(f"{p[0]} - {p[1]}")
+        protocolo_cifrado = p[0]
+        data_hora = p[1]
 
+        protocolo_original = descriptografar_protocolo(protocolo_cifrado)
+
+        print(f"{protocolo_original} - {data_hora}")

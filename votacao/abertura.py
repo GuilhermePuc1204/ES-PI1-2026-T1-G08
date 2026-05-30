@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 from database.conexao import conexao, cursor
 from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
@@ -10,7 +9,10 @@ def abrir_votacao():
     print("\n=== ABERTURA DO SISTEMA DE VOTAÇÃO ===")
 
     titulo = input("Título de eleitor do mesário: ").strip()
-    titulo_limpo = re.sub(r"\D", "", titulo)
+    titulo_limpo = ""
+    for c in titulo:
+        if c.isdigit():
+            titulo_limpo += c
 
     if len(titulo_limpo) < 4:
         print("Digite pelo menos 4 números do título.")
@@ -20,7 +22,6 @@ def abrir_votacao():
         )
         return
 
-    # Busca todos os eleitores
     cursor.execute(
         "SELECT id, nome, cpf, titulo_eleitor, mesario, chave_acesso FROM eleitores"
     )
@@ -28,7 +29,6 @@ def abrir_votacao():
 
     encontrados = []
 
-    # Filtra pelo prefixo do título
     for e in eleitores:
         id_eleitor, nome, cpf_criptografado, titulo_eleitor, mesario, chave_armazenada = e
 
