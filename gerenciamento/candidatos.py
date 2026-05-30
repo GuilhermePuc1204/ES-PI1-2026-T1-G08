@@ -119,6 +119,77 @@ def remover_candidato():
         print("Remoção cancelada.")
 
 
+def editar_candidato():
+    """
+    Edita as informações de um candidato cadastrado (RF001.11).
+
+    Localiza o candidato pelo número atual e permite alterar nome,
+    número de votação e partido. O novo número é revalidado quanto à
+    unicidade no banco de dados (não pode coincidir com o de outro
+    candidato). Manter o valor atual é possível pressionando ENTER
+    em cada campo.
+
+    Args:
+        Nenhum (a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens e atualiza o banco de
+        dados.
+    """
+    print("\n=== EDITAR CANDIDATO ===")
+
+    numero_atual = input("Digite o número do candidato a ser editado: ").strip()
+
+    sql = "SELECT id, nome, numero, partido FROM candidatos WHERE numero = %s"
+    cursor.execute(sql, (numero_atual,))
+    candidato = cursor.fetchone()
+
+    if not candidato:
+        print("Candidato não encontrado.")
+        return
+
+    id_candidato, nome_atual, num_atual, partido_atual = candidato
+
+    print(f"\nCandidato encontrado: {nome_atual} - Nº {num_atual} ({partido_atual})")
+    print("(Pressione ENTER para manter o valor atual)")
+
+    # Novo nome
+    novo_nome = input(f"Nome atual ({nome_atual}). Novo nome: ").strip()
+    if not novo_nome:
+        novo_nome = nome_atual
+
+    # Novo número (com revalidação de unicidade)
+    novo_numero_input = input(f"Número atual ({num_atual}). Novo número: ").strip()
+    if novo_numero_input:
+        cursor.execute(
+            "SELECT id FROM candidatos WHERE numero = %s AND id != %s",
+            (novo_numero_input, id_candidato)
+        )
+        if cursor.fetchone():
+            print("Número já cadastrado para outro candidato. Edição cancelada.")
+            return
+        novo_numero = novo_numero_input
+    else:
+        novo_numero = num_atual
+
+    # Novo partido
+    novo_partido = input(f"Partido atual ({partido_atual}). Novo partido: ").strip()
+    if not novo_partido:
+        novo_partido = partido_atual
+
+    cursor.execute(
+        """
+        UPDATE candidatos
+           SET nome = %s, numero = %s, partido = %s
+         WHERE id = %s
+        """,
+        (novo_nome, novo_numero, novo_partido, id_candidato)
+    )
+    conexao.commit()
+
+    print("\nCandidato atualizado com sucesso!")
+
+
 def buscar_candidato():
     """
     Busca os dados de um candidato pelo número de votação.
