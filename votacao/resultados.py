@@ -3,7 +3,21 @@ from utils.auditoria import registrar_evento
 
 
 def boletim_urna():
+    """
+    Gera o Boletim de Urna ao final da votação.
 
+    Consulta o total de votos recebidos por cada candidato em ordem
+    alfabética, exibe a contagem de votos nulos e declara o vencedor
+    da eleição informando nome, número, partido e total de votos
+    obtidos. Registra evento de auditoria no início e ao final da
+    apuração.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal e registra logs.
+    """
     registrar_evento(
         "APURACAO_INICIADA",
         "Apuração iniciada"
@@ -58,7 +72,20 @@ def boletim_urna():
         "Resultados exibidos"
     )
 def estatisticas_comparecimento():
+    """
+    Exibe as estatísticas de comparecimento dos eleitores.
 
+    Consulta o total de eleitores cadastrados e o total que efetivamente
+    votou (status "JA_VOTOU"), calcula o número de ausentes e o
+    percentual de comparecimento em relação ao total de eleitores
+    aptos.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal.
+    """
     print("\n=== ESTATÍSTICAS DE COMPARECIMENTO ===")
 
     cursor.execute("SELECT COUNT(*) FROM eleitores")
@@ -83,7 +110,19 @@ def estatisticas_comparecimento():
     print(f"Percentual de comparecimento: {porcentagem:.2f}%")
 
 def votos_por_partido():
+    """
+    Exibe a somatória de votos recebidos por cada partido (legenda).
 
+    Agrupa os votos pelo partido do candidato, calcula o percentual
+    sobre o total geral de votos, exibe a contagem de votos nulos e
+    destaca o partido mais votado.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal.
+    """
     print("\n=== VOTOS POR PARTIDO ===")
 
     # Votos por partido (exclui votos nulos automaticamente)
@@ -138,7 +177,20 @@ def votos_por_partido():
 
 
 def validacao_integridade():
+    """
+    Emite o relatório de validação de integridade da votação.
 
+    Compara o total de votos registrados na tabela "votos" com a
+    quantidade de eleitores cujo status é "JA_VOTOU". Se os valores
+    forem iguais, confirma a integridade da eleição; caso contrário,
+    emite um alerta indicando a diferença encontrada.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime o relatório no terminal.
+    """
     print("\n=== VALIDAÇÃO DE INTEGRIDADE ===")
 
     cursor.execute("SELECT COUNT(*) FROM votos")
@@ -162,7 +214,19 @@ def validacao_integridade():
 
 
 def menu_resultados():
+    """
+    Exibe o menu de Resultados da Votação (RF002.03).
 
+    Apresenta em loop as opções de Boletim de Urna, Estatísticas de
+    Comparecimento, Votos por Partido e Validação de Integridade,
+    direcionando para a função correspondente. Encerra ao receber "0".
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop.
+    """
     op = -1
 
     while op != "0":

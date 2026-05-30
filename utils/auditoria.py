@@ -9,6 +9,23 @@ NOME_ARQUIVO_AUDITORIA = datetime.now().strftime("auditoria_%Y%m%d_%H%M%S_%f.txt
 ARQUIVO_AUDITORIA = os.path.join(PASTA_AUDITORIA, NOME_ARQUIVO_AUDITORIA)
 
 def registrar_evento(acao, descricao):
+    """
+    Registra um evento no arquivo de log de auditoria do sistema.
+
+    Cria a pasta de logs caso ainda não exista e adiciona uma nova linha
+    ao arquivo de auditoria com o timestamp atual, o tipo da ação e a
+    descrição do evento, no formato:
+    [YYYY/MM/DD HH:MM:SS] ACAO | descricao
+
+    Args:
+        acao (str): Tipo da ocorrência (ex: "ABERTURA", "ALERTA",
+            "SUCESSO", "ENCERRAMENTO").
+        descricao (str): Descrição detalhada do evento registrado.
+
+    Returns:
+        None: A função não retorna valor; o efeito é a gravação em
+        arquivo.
+    """
     if not os.path.exists(PASTA_AUDITORIA):
         os.mkdir(PASTA_AUDITORIA)
 
@@ -25,9 +42,19 @@ def registrar_evento(acao, descricao):
     arquivo.close()
 
 def visualizar_auditoria():
-    
+    """
+    Lê e exibe no terminal o conteúdo do arquivo de auditoria atual.
 
+    Abre o arquivo de logs gerado na execução corrente e imprime cada
+    linha registrada, permitindo a conferência das ocorrências.
+    Caso o arquivo não exista ou esteja vazio, informa o usuário.
 
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal.
+    """
     print("\n=== AUDITORIA DO SISTEMA ===")
 
     try:
@@ -48,6 +75,20 @@ def visualizar_auditoria():
 
 
 def listar_protocolos():
+    """
+    Lista todos os protocolos de votação registrados no banco de dados.
+
+    Consulta a tabela de votos, descriptografa cada protocolo armazenado
+    (que está cifrado com a Cifra de Hill) e exibe no terminal o
+    protocolo original junto com a data e hora do voto, em ordem
+    alfabética.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal.
+    """
     print("\n=== PROTOCOLOS DE VOTAÇÃO ===")
 
     cursor.execute(

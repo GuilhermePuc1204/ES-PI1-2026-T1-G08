@@ -40,6 +40,20 @@ def descriptografar_cpf(cpf_cifrado):
 
 
 def descriptografar_protocolo(texto_cifrado):
+    """
+    Descriptografa um protocolo de votação cifrado com a Cifra de Hill.
+
+    Aplica a matriz chave inversa sobre o alfabeto expandido (A-Z + 0-9),
+    revertendo o processo de criptografia em blocos de 2 caracteres.
+    Utilizado pela auditoria para exibir protocolos em texto claro
+    para conferência.
+
+    Args:
+        texto_cifrado (str): Protocolo de votação criptografado.
+
+    Returns:
+        str: Protocolo original (texto claro).
+    """
     valores = []
 
     for c in texto_cifrado:

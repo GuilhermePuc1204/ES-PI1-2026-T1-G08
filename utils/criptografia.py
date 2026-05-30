@@ -20,6 +20,20 @@ alfabeto_chave = [
 ]
 
 def criptografar_cpf(cpf):
+    """
+    Criptografa o CPF do eleitor utilizando a Cifra de Hill.
+
+    O CPF é convertido em uma lista de inteiros e processado em blocos
+    de 2 dígitos. Cada bloco é multiplicado pela matriz chave (chave_hill)
+    com aritmética modular sobre o alfabeto A-Z (módulo 26). O resultado
+    é uma string de letras maiúsculas.
+
+    Args:
+        cpf (str): CPF apenas com dígitos numéricos, sem pontos ou traços.
+
+    Returns:
+        str: CPF criptografado representado em letras do alfabeto A-Z.
+    """
     cpf = [int(d) for d in cpf]
 
 
@@ -88,4 +102,17 @@ def criptografar_chave_acesso(chave):
     return "".join(resultado)
 
 def criptografar_protocolo(protocolo):
+    """
+    Criptografa o protocolo de votação utilizando a Cifra de Hill.
+
+    Reaproveita o mesmo algoritmo da chave de acesso, pois o protocolo
+    contém letras e números e portanto utiliza o mesmo alfabeto
+    expandido (A-Z + 0-9).
+
+    Args:
+        protocolo (str): Protocolo de votação em texto claro.
+
+    Returns:
+        str: Protocolo de votação criptografado.
+    """
     return criptografar_chave_acesso(protocolo)

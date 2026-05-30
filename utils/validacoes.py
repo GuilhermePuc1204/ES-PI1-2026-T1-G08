@@ -1,4 +1,20 @@
 def validar_cpf(cpf):
+    """
+    Valida o CPF utilizando o algoritmo oficial de dígitos verificadores.
+
+    Remove caracteres não numéricos da entrada, rejeita CPFs com todos os
+    dígitos iguais (ex: 111.111.111-11) e recalcula os dois dígitos
+    verificadores (10º e 11º) a partir dos nove primeiros dígitos,
+    comparando-os com os informados.
+
+    Args:
+        cpf (str): CPF informado pelo usuário, com ou sem formatação
+            (pontos e traço).
+
+    Returns:
+        bool: True se o CPF for matematicamente válido, False caso
+        contrário.
+    """
     cpf_limpo = ""
     
     for c in cpf:
@@ -9,6 +25,23 @@ def validar_cpf(cpf):
         return False
 
     def calcular_digito(cpf_parcial, peso_inicial):
+        """
+        Calcula um dígito verificador do CPF.
+
+        Multiplica cada algarismo do CPF parcial por pesos decrescentes
+        a partir de peso_inicial, soma os resultados e aplica a regra do
+        resto da divisão por 11: se o resto for menor que 2 o dígito é
+        0; caso contrário, o dígito é 11 - resto.
+
+        Args:
+            cpf_parcial (str): Sequência inicial do CPF a ser usada no
+                cálculo (9 dígitos para o primeiro DV, 10 para o segundo).
+            peso_inicial (int): Valor inicial dos pesos decrescentes
+                (10 para o primeiro DV, 11 para o segundo).
+
+        Returns:
+            int: Dígito verificador calculado (0 a 9).
+        """
         soma = sum(int(cpf_parcial[i]) * (peso_inicial - i) for i in range(len(cpf_parcial)))
         resto = soma % 11
         # Se o resto for menor que 2, o dígito é 0; caso contrário, é 11 - resto
@@ -21,7 +54,23 @@ def validar_cpf(cpf):
     return cpf_limpo[-2:] == f"{dv1}{dv2}"
 
 
-def validar_titulo_eleitor(titulo):  
+def validar_titulo_eleitor(titulo):
+    """
+    Valida o Título de Eleitor utilizando o algoritmo de dígitos verificadores.
+
+    O título possui 12 dígitos: 8 sequenciais, 2 da Unidade Federativa (UF)
+    e 2 verificadores. O primeiro DV é calculado sobre os 8 sequenciais
+    com pesos de 2 a 9; o segundo DV é calculado sobre a UF e o primeiro DV
+    com pesos 7, 8 e 9. Em ambos os cálculos, resto 10 vira 0, e nos
+    estados SP (01) e MG (02), resto 0 vira 1.
+
+    Args:
+        titulo (str): Número do título de eleitor com ou sem formatação.
+
+    Returns:
+        bool: True se o título for matematicamente válido, False caso
+        contrário.
+    """
     titulo_limpo = ""
     for c in titulo:
         if c.isdigit():

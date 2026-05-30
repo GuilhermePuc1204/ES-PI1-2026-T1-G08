@@ -1,7 +1,20 @@
 from gerenciamento.menu_gerenciamento import menu_gerenciamento  # importa a função do menu de gerenciamento
 from votacao.menu_votacao import menu_votacao  # importa a função do menu de votação
 
-def main():  # função principal do sistema
+def main():
+    """
+    Função principal do sistema de votação.
+
+    Exibe o menu inicial em loop, permitindo o acesso ao módulo de
+    Gerenciamento (cadastros) ou ao módulo de Votação (urna, auditoria
+    e resultados), até que o usuário escolha sair.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop.
+    """
     op=1
     while (op != 0):  # loop infinito para manter o sistema em execução
         print("\n=== SISTEMA DE VOTACAO ===") 

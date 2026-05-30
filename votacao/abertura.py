@@ -6,6 +6,24 @@ from votacao.urna import menu_urna
 
 
 def abrir_votacao():
+    """
+    Realiza a abertura do sistema de votação após autenticação do mesário.
+
+    Solicita título de eleitor, 4 primeiros dígitos do CPF e chave de
+    acesso do mesário, valida que o usuário possui o perfil de mesário e,
+    confirmada a identidade, executa a Zerésima (limpa todos os votos da
+    base e zera o status dos eleitores), exibe a listagem dos candidatos
+    com 0 votos e abre o menu de operação da urna. Em caso de
+    inconsistência, registra log de acesso negado e retorna ao menu
+    anterior.
+
+    Args:
+        Nenhum (toda a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens, registra logs e altera
+        o banco de dados.
+    """
     print("\n=== ABERTURA DO SISTEMA DE VOTAÇÃO ===")
 
     titulo = input("Título de eleitor do mesário: ").strip()

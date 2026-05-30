@@ -6,6 +6,23 @@ from utils.auditoria import registrar_evento
 
 
 def encerrar_votacao():
+    """
+    Realiza o encerramento da votação com dupla confirmação do mesário.
+
+    Solicita título, 4 primeiros dígitos do CPF e chave de acesso do
+    mesário, valida o perfil, pede confirmação ("Deseja realmente
+    encerrar a votação?") e, em caso afirmativo, exige uma segunda
+    inserção da chave de acesso. Apenas se ambas as validações forem
+    bem-sucedidas o encerramento é confirmado. Eventos de falha são
+    registrados em log.
+
+    Args:
+        Nenhum (toda a entrada é coletada via input do terminal).
+
+    Returns:
+        bool: True se o encerramento foi confirmado com sucesso, False
+        em qualquer falha de autenticação ou cancelamento pelo mesário.
+    """
     print("\n=== ENCERRAMENTO DA VOTAÇÃO ===")
 
     # --- PASSO 1: IDENTIFICAÇÃO DO MESÁRIO PELO TÍTULO ---

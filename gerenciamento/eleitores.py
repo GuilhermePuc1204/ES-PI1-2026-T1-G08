@@ -5,8 +5,22 @@ from utils.criptografia import criptografar_cpf, criptografar_chave_acesso
 from utils.descriptografia import descriptografar_cpf
 from utils.auditoria import registrar_evento
 
-def gerar_chave(nome): 
-    partes = nome.upper().split()  
+def gerar_chave(nome):
+    """
+    Gera a chave de acesso exclusiva do eleitor a partir do seu nome.
+
+    O padrão de geração utiliza as 2 primeiras letras do primeiro nome,
+    a 1ª letra do segundo nome e 4 dígitos aleatórios entre 1000 e 9999.
+    Caso o nome não possua ao menos duas partes, retorna None.
+
+    Args:
+        nome (str): Nome completo do eleitor.
+
+    Returns:
+        str: Chave de acesso gerada (ex: "ANS4821") ou None caso o nome
+        seja inválido (menos de duas partes).
+    """
+    partes = nome.upper().split()
 
     if len(partes) < 2:  # verifica se o nome tem pelo menos 2 partes (ex: nome e sobrenome)
         return None  
@@ -14,8 +28,24 @@ def gerar_chave(nome):
     return partes[0][:2] + partes[1][0] + str(random.randint(1000, 9999))  # monta a chave: 2 letras do 1º nome + 1 letra do 2º + número aleatório
 
 
-def cadastrar_eleitor():  
-    print("\n=== CADASTRO DE ELEITOR ===")  
+def cadastrar_eleitor():
+    """
+    Realiza o cadastro de um novo eleitor no sistema.
+
+    Solicita nome completo, CPF, título de eleitor e a indicação se o
+    eleitor atuará como mesário. Valida CPF e título de eleitor pelos
+    seus dígitos verificadores, impede a duplicidade, gera e criptografa
+    a chave de acesso e armazena o CPF de forma cifrada no banco de
+    dados.
+
+    Args:
+        Nenhum (a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens e registra o cadastro
+        no banco de dados.
+    """
+    print("\n=== CADASTRO DE ELEITOR ===")
 
     nome = input("Nome completo: ")  # lê o nome do eleitor
 
@@ -79,6 +109,19 @@ def cadastrar_eleitor():
 
 
 def listar_eleitores():
+    """
+    Lista todos os eleitores cadastrados no banco de dados.
+
+    Consulta a tabela de eleitores, descriptografa cada CPF armazenado
+    para exibição formatada (XXX.XXX.XXX-XX) e imprime nome, CPF,
+    título, indicação de mesário e status do voto.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função apenas imprime no terminal.
+    """
     print("\n=== LISTA DE ELEITORES ===")
 
     sql = """
@@ -106,6 +149,20 @@ def listar_eleitores():
 
 
 def buscar_eleitor():
+    """
+    Busca um eleitor específico pelo CPF ou pelo Título de Eleitor.
+
+    Lê uma entrada numérica do usuário (pelo menos 4 dígitos), tenta
+    localizar primeiro pelo prefixo criptografado do CPF e, caso não
+    encontre, busca pelo título de eleitor (LIKE prefixo). Exibe os
+    dados do eleitor encontrado ou mensagem de não encontrado.
+
+    Args:
+        Nenhum (a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe os dados no terminal.
+    """
     print("\n=== BUSCAR ELEITOR ===")
 
     valor = input("Digite CPF ou Título: ").strip()
@@ -179,6 +236,20 @@ def buscar_eleitor():
     print("Eleitor não encontrado.")
 
 def remover_eleitor():
+    """
+    Remove um eleitor cadastrado a partir do CPF informado.
+
+    Solicita o CPF (mínimo 4 dígitos), busca eleitores cujo CPF
+    criptografado comece com o prefixo informado e, encontrando apenas
+    um, solicita confirmação antes de executar o DELETE no banco de
+    dados. Se houver mais de um match, cancela e exige o CPF completo.
+
+    Args:
+        Nenhum (a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens e altera o banco de dados.
+    """
     print("\n=== REMOVER ELEITOR ===")
 
     cpf = input("Digite o CPF: ").strip()
@@ -240,6 +311,22 @@ def remover_eleitor():
 
 
 def editar_eleitor():
+    """
+    Edita os dados de um eleitor cadastrado.
+
+    Localiza o eleitor pelo prefixo do CPF e permite alterar nome, CPF,
+    título de eleitor e indicação de mesário. CPF e título são
+    revalidados pelos dígitos verificadores e checados quanto à
+    unicidade no banco. Manter o valor atual é possível pressionando
+    ENTER em cada campo.
+
+    Args:
+        Nenhum (a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens e atualiza o banco de
+        dados.
+    """
     print("\n=== EDITAR ELEITOR ===")
 
     cpf = input("Digite o CPF do eleitor: ").strip()

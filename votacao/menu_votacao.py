@@ -4,7 +4,19 @@ from utils.auditoria import visualizar_auditoria, listar_protocolos
 
 
 def menu_auditoria():
+    """
+    Exibe o submenu de Auditoria da Votação (RF002.02).
 
+    Apresenta em loop as opções de visualização do arquivo de logs de
+    ocorrências e da listagem de protocolos de votação registrados na
+    base. Encerra ao receber "0".
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop.
+    """
     op = -1
 
     while op != "0":
@@ -29,7 +41,19 @@ def menu_auditoria():
 
 
 def menu_votacao():
+    """
+    Exibe o menu principal do módulo de Votação (RF002).
 
+    Apresenta em loop as opções "Abrir Sistema de Votação", "Auditoria
+    da Votação" e "Resultados da Votação", direcionando para o submódulo
+    correspondente. Encerra ao receber "0".
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop.
+    """
     op = -1
 
     while op != "0":

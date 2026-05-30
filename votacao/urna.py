@@ -3,7 +3,20 @@ from utils.auditoria import registrar_evento
 from votacao.encerramento import encerrar_votacao
 
 def menu_urna():
+    """
+    Exibe o menu de operação da urna eletrônica após a abertura do sistema.
 
+    Apresenta em loop as opções "Votar" (registra um novo voto) e
+    "Encerrar Votação" (com dupla confirmação do mesário). Sai do loop
+    automaticamente quando o encerramento é confirmado com sucesso.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop ou ao
+        encerrar a votação.
+    """
     op =""
 
     while op != "0":

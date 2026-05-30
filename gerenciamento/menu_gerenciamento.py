@@ -2,7 +2,19 @@ from gerenciamento.candidatos import (cadastrar_candidato, listar_candidatos, re
 from gerenciamento.eleitores import (cadastrar_eleitor, listar_eleitores, buscar_eleitor, remover_eleitor, editar_eleitor)
 
 def menu_gerenciamento():
+    """
+    Exibe o menu principal do módulo de Gerenciamento (RF001).
 
+    Apresenta em loop as opções de cadastro, listagem, busca, edição e
+    remoção de eleitores e candidatos, direcionando para as funções
+    correspondentes. Encerra ao receber a opção "0".
+
+    Args:
+        Nenhum.
+
+    Returns:
+        None: A função não retorna valor; encerra ao sair do loop.
+    """
     op = -1  # inicializa a variável
 
     while op != "0":

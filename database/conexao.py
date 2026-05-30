@@ -7,8 +7,18 @@ cursor = None
 
 def conectar_banco():
     """
-    Realiza a conexão com o banco de dados.
-    Retorna True se conectar com sucesso, False caso contrário.
+    Estabelece a conexão com o banco de dados MySQL do sistema de votação.
+
+    Atribui os objetos de conexão e cursor às variáveis globais do módulo,
+    que são utilizadas pelas demais funções do projeto para executar
+    queries.
+
+    Args:
+        Nenhum.
+
+    Returns:
+        bool: True se a conexão foi estabelecida com sucesso, False caso
+        ocorra erro de conexão (ex: MySQL desligado, credenciais inválidas).
     """
     global conexao, cursor
 

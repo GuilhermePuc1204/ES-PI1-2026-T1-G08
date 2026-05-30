@@ -6,6 +6,20 @@ from utils.auditoria import registrar_evento
 
 
 def gerar_protocolo(numero):
+    """
+    Gera um número de protocolo único para o voto registrado.
+
+    O padrão do protocolo é: prefixo "V" + 2 letras aleatórias + ano "26"
+    + número do candidato + 5 dígitos aleatórios.
+
+    Args:
+        numero (str): Número do candidato escolhido (ou string vazia em
+            caso de voto nulo).
+
+    Returns:
+        str: Protocolo de votação gerado em texto claro (antes da
+        criptografia).
+    """
     letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     numeros = "0123456789"
 
@@ -22,7 +36,23 @@ def gerar_protocolo(numero):
     return "V" + parte_letras + "26" + numero + parte_numeros
 
 def votar():
+    """
+    Executa o fluxo completo de votação de um eleitor na urna.
 
+    Solicita o título de eleitor, os 4 primeiros dígitos do CPF e a
+    chave de acesso, valida as credenciais consultando a base, impede
+    voto duplo, exibe os dados do candidato escolhido para conferência,
+    permite reescolha caso não seja confirmado e, ao confirmar, registra
+    o voto (com data/hora e protocolo criptografado) e atualiza o status
+    do eleitor para "JA_VOTOU". Caso o número não exista, registra como
+    voto nulo.
+
+    Args:
+        Nenhum (toda a entrada é coletada via input do terminal).
+
+    Returns:
+        None: A função apenas exibe mensagens e altera o banco de dados.
+    """
     print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
 
     titulo = input("Título de eleitor: ").strip()
